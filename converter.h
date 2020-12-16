@@ -7,12 +7,13 @@
 
 class Converter
 {
-public:
-    static double byteToDouble(const QByteArray& byteArray);
-    static uchar byteToUchar(const QByteArray& byteArray);
-    static ulong byteToLond(const QByteArray&byteArray);
-    static uint byteToInt(const QByteArray& byteArray);
-    static QList<uchar> byteToCharArray(const QByteArray& byteArray);
+    public:
+        static double byteToDouble(const QByteArray& byteArray);
+        static uchar byteToUchar(const QByteArray& byteArray);
+        static ulong byteToULond(const QByteArray&byteArray);
+        static long byteToLond(const QByteArray&byteArray);
+        static uint byteToInt(const QByteArray& byteArray);
+        static QList<uchar> byteToCharArray(const QByteArray& byteArray);
 };
 
 #endif // CONVERTER_H

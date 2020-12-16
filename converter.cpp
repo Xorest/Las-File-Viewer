@@ -14,9 +14,16 @@ uchar Converter::byteToUchar(const QByteArray& byteArray)
     return result;
 }
 
-ulong Converter::byteToLond(const QByteArray& byteArray)
+ulong Converter::byteToULond(const QByteArray& byteArray)
 {
     ulong result;
+    memcpy(&result, byteArray.data(), byteArray.size());
+    return result;
+}
+
+long Converter::byteToLond(const QByteArray &byteArray)
+{
+    long result;
     memcpy(&result, byteArray.data(), byteArray.size());
     return result;
 }

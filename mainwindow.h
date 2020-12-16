@@ -12,13 +12,12 @@ class MainWindow : public QMainWindow
 {
     Q_OBJECT
 
-public:
-    MainWindow(QWidget* parent = nullptr);
-    ~MainWindow();
-
-private:
-    Ui::MainWindow* ui;
-    File* _lasFile;
+    public:
+        MainWindow(QWidget* parent = nullptr);
+        ~MainWindow();
+    private:
+        Ui::MainWindow* ui;
+        File* _lasFile;
 
 };
 #endif // MAINWINDOW_H
