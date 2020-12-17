@@ -20,6 +20,7 @@ SOURCES += \
     headerfile.cpp \
     main.cpp \
     mainwindow.cpp \
+    openglwidget.cpp \
     pointdatarecords.cpp \
     variablelengthrecordsfile.cpp
 
@@ -28,6 +29,7 @@ HEADERS += \
     file.h \
     headerfile.h \
     mainwindow.h \
+    openglwidget.h \
     pointdatarecords.h \
     variablelengthrecordsfile.h
 

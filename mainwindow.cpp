@@ -10,6 +10,8 @@ MainWindow::MainWindow(QWidget *parent)
     ui->setupUi(this);
     QString path = "D:/art/las/lasfile1.las";
     _lasFile = new File(path);
+
+    ui->openGLWidget->setPointsByOpenGL(_lasFile->points());
 }
 
 MainWindow::~MainWindow()
