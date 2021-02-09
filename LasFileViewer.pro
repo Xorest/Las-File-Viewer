@@ -1,4 +1,4 @@
-QT       += core gui
+QT       += core gui opengl
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -15,6 +15,7 @@ UI_DIR = build
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    camera.cpp \
     converter.cpp \
     file.cpp \
     headerfile.cpp \
@@ -25,6 +26,7 @@ SOURCES += \
     variablelengthrecordsfile.cpp
 
 HEADERS += \
+    camera.h \
     converter.h \
     file.h \
     headerfile.h \

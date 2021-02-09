@@ -28,9 +28,16 @@ long Converter::byteToLond(const QByteArray &byteArray)
     return result;
 }
 
-uint Converter::byteToInt(const QByteArray& byteArray)
+uint Converter::byteToUInt(const QByteArray& byteArray)
 {
     uint result;
+    memcpy(&result, byteArray.data(), byteArray.size());
+    return result;
+}
+
+ushort Converter::byteToUShort(const QByteArray &byteArray)
+{
+    ushort result;
     memcpy(&result, byteArray.data(), byteArray.size());
     return result;
 }

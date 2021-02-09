@@ -1,19 +1,20 @@
 #include "pointdatarecords.h"
 #include "converter.h"
+#include <QDebug>
 
 PointDataRecords::PointDataRecords(const QByteArray &bytes)
 {
     _x = Converter::byteToLond(bytes.mid(0, 4));
     _y = Converter::byteToLond(bytes.mid(4, 4));
     _z = Converter::byteToLond(bytes.mid(8, 4));
-    _intensity = Converter::byteToInt(bytes.mid(12, 2));
+    _intensity = Converter::byteToUShort(bytes.mid(12, 2));
     _classification = Converter::byteToUchar(bytes.mid(15, 1));
     _scanAngleRank = Converter::byteToUchar(bytes.mid(16, 1));
     _userData = Converter::byteToUchar(bytes.mid(17, 1));
-    _pointSourceId = Converter::byteToInt(bytes.mid(18, 2));
-    _red = Converter::byteToInt(bytes.mid(20, 2));
-    _green = Converter::byteToInt(bytes.mid(22, 2));
-    _blue = Converter::byteToInt(bytes.mid(24, 2));
+    _pointSourceId = Converter::byteToUInt(bytes.mid(18, 2));
+    _red = Converter::byteToUShort(bytes.mid(20, 2));
+    _green = Converter::byteToUShort(bytes.mid(22, 2));
+    _blue = Converter::byteToUShort(bytes.mid(24, 2));
 }
 
 long PointDataRecords::x()

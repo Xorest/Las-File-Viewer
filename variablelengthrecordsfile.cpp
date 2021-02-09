@@ -3,10 +3,10 @@
 
 VariableLengthRecordsFile::VariableLengthRecordsFile(const QByteArray &bytes)
 {
-    _reserved = Converter::byteToInt(bytes.mid(0, 2));
+    _reserved = Converter::byteToUInt(bytes.mid(0, 2));
     _userId = QString::fromLocal8Bit(bytes.mid(2,16));
-    _recordId = Converter::byteToInt(bytes.mid(18,2));
-    _recordLengthAfterHeader = Converter::byteToInt(bytes.mid(20, 2));
+    _recordId = Converter::byteToUInt(bytes.mid(18,2));
+    _recordLengthAfterHeader = Converter::byteToUInt(bytes.mid(20, 2));
     _description = QString::fromLocal8Bit(bytes.mid(22,32));
 }
 

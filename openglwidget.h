@@ -2,18 +2,23 @@
 #define OPENGLWIDGET_H
 
 #include <QOpenGLContext>
-#include <QOpenGLFunctions_3_0>
+#include <QOpenGLFunctions>
 #include <QOpenGLPaintDevice>
-#include <QtGui/QOpenGLShaderProgram>
+#include <QOpenGLShaderProgram>
 #include <QOpenGLWidget>
+#include <QOpenGLBuffer>
+#include <QOpenGLVertexArrayObject>
+#include <QOffscreenSurface>
 #include <QList>
 #include <QVector3D>
 #include <QVector>
 #include <QWidget>
 #include "pointdatarecords.h"
+#include "camera.h"
 
+QT_FORWARD_DECLARE_CLASS(QOpenGLShaderProgram);
 
-class OpenGLWidget : public QOpenGLWidget, protected QOpenGLFunctions_3_0
+class OpenGLWidget : public QOpenGLWidget, protected QOpenGLFunctions
 {
     public:
         OpenGLWidget(QWidget* parent);
@@ -22,21 +27,31 @@ class OpenGLWidget : public QOpenGLWidget, protected QOpenGLFunctions_3_0
     protected:
         void initializeGL() override;
         void paintGL() override;
+        void mousePressEvent(QMouseEvent* event) override;
+        void mouseReleaseEvent(QMouseEvent* event) override;
+        void mouseMoveEvent(QMouseEvent* event) override;
+        void keyPressEvent(QKeyEvent* event) override;
+        void wheelEvent(QWheelEvent *event) override;
     private:
-        bool _isInitialized;
-        QVector<QVector3D> _points;
-        QOpenGLContext* _context;
+        QList<PointDataRecords*> _points;
+        QOpenGLBuffer _vbo;
         QOpenGLShaderProgram* _shaderProgramm;
-        QOpenGLPaintDevice* _paintDevice;
         GLint _position;
         GLint _color;
-        GLint _matrixUniform;
         GLint _size;
         QVector<QVector3D> _pointsPosion;
         QVector<QVector3D> _pointsColor;
-        QList<int> _maxPoint;
-        QList<int> _minPoint;
-
+        QVector<int> _maxPoint;
+        QVector<int> _minPoint;
+        int _matrixLoc;
+        Camera* _camera;
+        bool _debug;
+        bool _pressed = false;
+        QPoint _lastPos;
+        int _zoom;
+        void initCamera(QVector3D position);
+        void initShader();
+        void initVBO();
 
 };
 

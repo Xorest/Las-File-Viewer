@@ -1,30 +1,26 @@
-//#include <QOpenGLFunctions>
+﻿#include <QOpenGLFunctions>
 #include <QOpenGLBuffer>
-#include <QtGui/QMatrix4x4>
-#include <QtGui/QScreen>
+#include <QMatrix4x4>
 #include <QPainter>
-#include <QtGui/QOpenGLFunctions>
+#include <QMouseEvent>
 #include "openglwidget.h"
 
 
 OpenGLWidget::OpenGLWidget(QWidget* parent)
     : QOpenGLWidget(parent),
-      _isInitialized(false)
-{
-
-}
+      _zoom(-50)
+{}
 
 OpenGLWidget::~OpenGLWidget()
 {
-//    delete _context;
-//    delete _shaderProgramm;
-//    delete _paintDevice;
+
 }
 
 void OpenGLWidget::setPointsByOpenGL(QList<PointDataRecords*> points)
 {
-    _pointsPosion.resize(points.size());
-    _pointsColor.resize(points.size());
+    _points = points;
+//    _pointsPosion.resize(points.size());
+//    _pointsColor.resize(points.size());
 
     int maxX = points[0]->x();
     int maxY = points[0]->y();
@@ -43,25 +39,24 @@ void OpenGLWidget::setPointsByOpenGL(QList<PointDataRecords*> points)
         minZ = minZ > points[i]->z() ? points[i]->z() : minZ;
 
 
-        _pointsPosion[i].setX(points[i]->x());
-        _pointsPosion[i].setY(points[i]->y());
-        _pointsPosion[i].setZ(points[i]->z());
-        _pointsColor[i].setX(points[i]->red());
-        _pointsColor[i].setX(points[i]->green());
-        _pointsColor[i].setX(points[i]->blue());
+//        _pointsPosion[i].setX(points[i]->x());
+//        _pointsPosion[i].setY(points[i]->y());
+//        _pointsPosion[i].setZ(points[i]->z());
+//        _pointsColor[i].setX((points[i]->red() / 655.35) * 0.01);
+//        _pointsColor[i].setY((points[i]->green() / 655.35) * 0.01);
+//        _pointsColor[i].setZ((points[i]->blue() / 655.35) * 0.01);
     }
 
     qDebug()<<"max"<<maxX<<maxY<<maxZ;
-    qDebug()<<"main"<<minX<<minY<<minZ;
+    qDebug()<<"min"<<minX<<minY<<minZ;
 
-    for(QVector3D& v : _pointsPosion)
-    {
-        v.setX((v.x() - (minX + (maxX - minX) / 2)));
-        v.setY((v.y() - (minY + (maxY - minY) / 2)));
-        v.setZ((v.z() - (minZ + (maxZ - minZ) / 2)));
-    }
-
-    qDebug()<<_pointsPosion[0].x()<<_pointsPosion[0].y(),_pointsPosion[0].z();
+//    for(QVector3D& v : _pointsPosion)
+//    {
+//        v.setX((v.x() - (minX + (maxX - minX) / 2)));
+//        v.setY((v.y() - (minY + (maxY - minY) / 2)));
+//        v.setZ((v.z() - (minZ + (maxZ - minZ) / 2)));
+////        qDebug()<<v.x()<<v.y()<<v.z();
+//    }
 
     _maxPoint.append(maxX);
     _maxPoint.append(maxY);
@@ -69,98 +64,168 @@ void OpenGLWidget::setPointsByOpenGL(QList<PointDataRecords*> points)
     _minPoint.append(minX);
     _minPoint.append(minY);
     _minPoint.append(minZ);
-
 }
 
 void OpenGLWidget::initializeGL()
 {
     initializeOpenGLFunctions();
-
-    static const char* vertexShaderSource =
-        "in vec3 position;\n"
-        "uniform mat4 matrix;\n"
-        "uniform float size;\n"
-        "void main() {\n"
-        "   gl_Position = matrix * vec4(position[0], position[1], position[2], 1.0);\n"
-        "   gl_PointSize = size;\n"
-        "}\n";
-
-    static const char* fragmentShaderSource =
-        "uniform vec4 color;\n"
-        "void main() {\n"
-        "   gl_FragColor = color;\n"
-        "}\n";
-
-    _shaderProgramm = new QOpenGLShaderProgram(this);
-    _shaderProgramm->addShaderFromSourceCode(QOpenGLShader::Vertex, vertexShaderSource);
-    _shaderProgramm->addShaderFromSourceCode(QOpenGLShader::Fragment, fragmentShaderSource);
-    _shaderProgramm->link();
-
-    _position = _shaderProgramm->attributeLocation("position");
-    _matrixUniform = _shaderProgramm->uniformLocation("matrix");
-    _size = _shaderProgramm->uniformLocation("size");
-    _color = _shaderProgramm->uniformLocation("color");
-
-    _isInitialized = true;
+    initCamera(QVector3D(0,0,0));
+    initVBO();
+    glEnable(GL_PROGRAM_POINT_SIZE);
+    glEnable(GL_DEPTH_TEST);
+    initShader();
 }
 
 void OpenGLWidget::paintGL()
 {
-    if (_isInitialized && updatesEnabled())
-    {
-        QPainter painter(this);
+    QPainter painter(this);
+    painter.setClipRect(contentsRect(), Qt::IntersectClip);
+    QColor bg = palette().color(QPalette::Background);
 
-        painter.setClipRect(contentsRect(), Qt::IntersectClip);
-        QColor bg = palette().color(QPalette::Background);
-        QOpenGLFunctions* gl = QOpenGLContext::currentContext()->functions();
+    glClearColor(bg.redF(), bg.greenF(), bg.blueF(), bg.alphaF());
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        painter.beginNativePainting();
-        gl->glClearColor(bg.redF(), bg.greenF(), bg.blueF(), bg.alphaF());
-        gl->glClear(GL_COLOR_BUFFER_BIT);
-        gl->glEnable(GL_PROGRAM_POINT_SIZE);
-        gl->glEnable(GL_POINT_SPRITE);
+    QMatrix4x4 m = _camera->viewMatrix();
+    //m.setToIdentity();
 
-        glViewport(0, 0, width(), height());
+    m.scale(0.2,0.2,0.2);
+    m.frustum(-5,5, -5,5, 1, 1000);
+    m.translate(0,0,_zoom);
 
-        int count = _pointsPosion.size();
 
-        QOpenGLBuffer buffer;
-        buffer.create();
-        buffer.bind();
-        buffer.setUsagePattern(QOpenGLBuffer::StreamDraw);
-        buffer.allocate(3 * sizeof (float) * count);
-        float* ptr = (float*) buffer.map(QOpenGLBuffer::WriteOnly);
+    _shaderProgramm->bind();
+    _shaderProgramm->setUniformValue("matrix", m);
+    _shaderProgramm->enableAttributeArray(0);
+    _shaderProgramm->enableAttributeArray(1);
+    _shaderProgramm->setAttributeBuffer(0, GL_FLOAT, 0, 3, 6 * sizeof(GLfloat));
+    _shaderProgramm->setAttributeBuffer(1, GL_FLOAT, 3 * sizeof(GLfloat), 3, 6 * sizeof(GLfloat));
 
-        // point
-        for (const QVector3D& v : _pointsPosion)
-        {
-            *ptr++ = v.x();
-            *ptr++ = v.y();
-            *ptr++ = v.z();
-        }
+    glDrawArrays(GL_POINTS, 0, _points.size());
+}
 
-        buffer.unmap();
+void OpenGLWidget::mousePressEvent(QMouseEvent *event)
+{
+    _pressed = true;
+    _lastPos = event->pos();
+}
 
-        QMatrix4x4 matrix;
-        matrix.perspective(5.0f, 4.0f / 3.0f, 0.1f, 10000000.0f);
-        matrix.translate( 0, 0, -100000);
+void OpenGLWidget::mouseReleaseEvent(QMouseEvent *)
+{
+    _pressed = false;
+}
 
-        _shaderProgramm->bind();
-        _shaderProgramm->enableAttributeArray(_position);
-        _shaderProgramm->setAttributeBuffer(_position, GL_FLOAT, 0, 3);
-        _shaderProgramm->setUniformValue(_matrixUniform, matrix);
-        _shaderProgramm->setUniformValue(_size, 1.0f);
-        _shaderProgramm->setUniformValue(_color, QColor(Qt::red));
+void OpenGLWidget::mouseMoveEvent(QMouseEvent *event)
+{
+    if (!_pressed)
+        return;
 
-        gl->glDisable(GL_MULTISAMPLE);
-        gl->glDrawArrays(GL_POINTS, 0, count);
-        gl->glEnable(GL_MULTISAMPLE);
+    int dx = event->pos().x() - _lastPos.x();
+    int dy = event->pos().y() - _lastPos.y();
 
-        _shaderProgramm->release();
+    if (dy)
+        _camera->pitch(dy / 10.0f);
 
-        buffer.release();
-        buffer.destroy();
+    if (dx)
+        _camera->yaw(dx / 10.0f);
 
-        painter.endNativePainting();
+    _lastPos = event->pos();
+
+    update();
+}
+
+void OpenGLWidget::keyPressEvent(QKeyEvent *event)
+{
+    const float amount = event->modifiers().testFlag(Qt::ShiftModifier) ? 1.0f : 0.1f;
+    switch (event->key()) {
+    case Qt::Key_W:
+        _camera->walk(amount);
+        break;
+    case Qt::Key_S:
+        _camera->walk(-amount);
+        break;
+    case Qt::Key_A:
+        _camera->strafe(-amount);
+        break;
+    case Qt::Key_D:
+        _camera->strafe(amount);
+        break;
+    default:
+        break;
     }
+
+    update();
+}
+
+void OpenGLWidget::wheelEvent(QWheelEvent *event)
+{
+    event->angleDelta().y() < 0 ? _zoom-= 20 : _zoom+= 20;
+
+    update();
+}
+
+
+void OpenGLWidget::initCamera(QVector3D position)
+{
+    _camera = new Camera(position);
+}
+
+void OpenGLWidget::initShader()
+{
+
+    QOpenGLShader *vshader = new QOpenGLShader(QOpenGLShader::Vertex, this);
+    static const char* vertexShaderSource =
+        "attribute highp vec3 position;\n"
+        "attribute mediump vec3 color;\n"
+        "uniform mediump mat4 matrix;\n"
+        "varying mediump vec3 outColor;\n"
+        "void main() {\n"
+        "   gl_Position = matrix *vec4(position, 1.0);\n"
+        "   gl_PointSize = 3;\n"
+        "   outColor = color;\n"
+        "}\n";
+    vshader->compileSourceCode(vertexShaderSource);
+
+    QOpenGLShader *fshader = new QOpenGLShader(QOpenGLShader::Fragment, this);
+    static const char* fragmentShaderSource =
+        "varying mediump vec3 outColor;\n"
+        "void main() {\n"
+        "   gl_FragColor = vec4(outColor, 1.0);\n"
+        "}\n";
+    fshader->compileSourceCode(fragmentShaderSource);
+
+    _shaderProgramm = new QOpenGLShaderProgram;
+    _shaderProgramm->addShader(vshader);
+    _shaderProgramm->addShader(fshader);
+    _shaderProgramm->bindAttributeLocation("position", 0);
+    _shaderProgramm->bindAttributeLocation("color", 1);
+    _shaderProgramm->link();
+}
+
+void OpenGLWidget::initVBO()
+{
+    QVector<GLfloat> vertData;
+    int k = 50;
+
+    for (PointDataRecords* p : _points)
+    {
+        vertData.append((p->x() - (_minPoint[0] + (_maxPoint[0] - _minPoint[0]) / 2)));
+        vertData.append((p->y() - (_minPoint[1] + (_maxPoint[1] - _minPoint[1]) / 2)));
+        vertData.append((p->z() - (_minPoint[2] + (_maxPoint[2] - _minPoint[2]) / 2))/100);
+        vertData.append((p->red() / 655.35) * 0.01);
+        vertData.append((p->green()/ 655.35) * 0.01);
+        vertData.append((p->blue()/ 655.35) * 0.01);
+
+//        vertData.append(p->x());
+//        vertData.append(p->y());
+//        vertData.append(p->z());
+//        vertData.append((p->red() / 655.35) * 0.01);
+//        vertData.append((p->green()/ 655.35) * 0.01);
+//        vertData.append((p->blue()/ 655.35) * 0.01);
+
+    }
+    _points.size() > 30 ? qDebug()<< _points.size():qDebug()<<vertData;
+
+    _vbo.create();
+    _vbo.bind();
+    _vbo.allocate(vertData.constData(), vertData.count() * sizeof(GLfloat));
 }

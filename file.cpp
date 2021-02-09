@@ -41,6 +41,7 @@ QList<PointDataRecords*> File::getPoints(const QByteArray& bytes)
 {
     QList<PointDataRecords*> result;
     int count = bytes.size() / 26;
+//    int count = 30;
 
     for (int i = 0; i < count; i++)
     {
