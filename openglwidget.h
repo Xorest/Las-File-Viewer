@@ -15,6 +15,7 @@
 #include <QWidget>
 #include <QPoint>
 #include <QPointF>
+#include <QAction>
 #include "pointdatarecords.h"
 #include "camera.h"
 
@@ -26,6 +27,8 @@ class OpenGLWidget : public QOpenGLWidget, protected QOpenGLFunctions
         OpenGLWidget(QWidget* parent);
         ~OpenGLWidget() override;
         void setPointsByOpenGL(QList<PointDataRecords*> points);
+        QPoint cutPosBegin();
+        QPoint cutPosEnd();
     protected:
         void initializeGL() override;
         void paintGL() override;
@@ -49,6 +52,8 @@ class OpenGLWidget : public QOpenGLWidget, protected QOpenGLFunctions
         QPointF _lastPosF;
         int _zoom;
         bool _isContrePress;
+        QPoint _cutPosBegin, _cutPosEnd;
+        QAction cutAction;
         void initCamera(QVector3D position);
         void initShader();
         void initVBO();

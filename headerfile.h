@@ -9,6 +9,7 @@ class HeaderFile
 {
     public:
         HeaderFile(const QByteArray& bytes);
+        HeaderFile();
         QString signatureLASF();
         uint sourceId();
         uint globalEncoding();
@@ -41,6 +42,12 @@ class HeaderFile
         double minX();
         double minY();
         double minZ();
+        void setMaxX(double maxX);
+        void setMaxY(double maxY);
+        void setMaxZ(double maxZ);
+        void setMinX(double minX);
+        void setMinY(double minY);
+        void setMinZ(double minZ);
     private:
         QString _signatureLASF;
         uint _sourceId;

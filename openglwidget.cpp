@@ -38,26 +38,10 @@ void OpenGLWidget::setPointsByOpenGL(QList<PointDataRecords*> points)
         minX = minX > points[i]->x() ? points[i]->x() : minX;
         minY = minY > points[i]->y() ? points[i]->y() : minY;
         minZ = minZ > points[i]->z() ? points[i]->z() : minZ;
-
-
-//        _pointsPosion[i].setX(points[i]->x());
-//        _pointsPosion[i].setY(points[i]->y());
-//        _pointsPosion[i].setZ(points[i]->z());
-//        _pointsColor[i].setX((points[i]->red() / 655.35) * 0.01);
-//        _pointsColor[i].setY((points[i]->green() / 655.35) * 0.01);
-//        _pointsColor[i].setZ((points[i]->blue() / 655.35) * 0.01);
     }
 
     qDebug()<<"max"<<maxX<<maxY<<maxZ;
     qDebug()<<"min"<<minX<<minY<<minZ;
-
-//    for(QVector3D& v : _pointsPosion)
-//    {
-//        v.setX((v.x() - (minX + (maxX - minX) / 2)));
-//        v.setY((v.y() - (minY + (maxY - minY) / 2)));
-//        v.setZ((v.z() - (minZ + (maxZ - minZ) / 2)));
-////        qDebug()<<v.x()<<v.y()<<v.z();
-//    }
 
     _maxPoint.append(maxX);
     _maxPoint.append(maxY);
@@ -65,6 +49,16 @@ void OpenGLWidget::setPointsByOpenGL(QList<PointDataRecords*> points)
     _minPoint.append(minX);
     _minPoint.append(minY);
     _minPoint.append(minZ);
+}
+
+QPoint OpenGLWidget::cutPosBegin()
+{
+    return _cutPosBegin;
+}
+
+QPoint OpenGLWidget::cutPosEnd()
+{
+    return _cutPosEnd;
 }
 
 void OpenGLWidget::initializeGL()
@@ -144,6 +138,9 @@ void OpenGLWidget::mouseMoveEvent(QMouseEvent *event)
         point.setY(((2.0 * _zoom) - (4.0 * _zoom) * event->pos().y() / height()) + (_minPoint[1] + ((_maxPoint[1] - _minPoint[1])/2)));
 
         createVboLineLoop(&_vboLineLoop, _lastPosF, point);
+
+        _cutPosBegin = _lastPosF.toPoint();
+        _cutPosEnd = point.toPoint();
     }
 
     update();

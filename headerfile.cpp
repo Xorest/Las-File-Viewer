@@ -46,6 +46,11 @@ HeaderFile::HeaderFile(const QByteArray &bytes)
     _minZ = Converter::byteToDouble(bytes.mid(219, 8));
 }
 
+HeaderFile::HeaderFile()
+{
+
+}
+
 QString HeaderFile::signatureLASF()
 {
     return  _signatureLASF;
@@ -204,4 +209,34 @@ double HeaderFile::minY()
 double HeaderFile::minZ()
 {
     return  _minZ;
+}
+
+void HeaderFile::setMaxX(double maxX)
+{
+    _maxX = maxX;
+}
+
+void HeaderFile::setMaxY(double maxY)
+{
+    _maxY = maxY;
+}
+
+void HeaderFile::setMaxZ(double maxZ)
+{
+    _maxZ = maxZ;
+}
+
+void HeaderFile::setMinX(double minX)
+{
+    _minX = minX;
+}
+
+void HeaderFile::setMinY(double minY)
+{
+    _minY = minY;
+}
+
+void HeaderFile::setMinZ(double minZ)
+{
+    _minZ = minZ;
 }

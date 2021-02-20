@@ -2,6 +2,9 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QAction>
+#include <QMenu>
+#include <QContextMenuEvent>
 #include "file.h"
 
 QT_BEGIN_NAMESPACE
@@ -15,9 +18,16 @@ class MainWindow : public QMainWindow
     public:
         MainWindow(QWidget* parent = nullptr);
         ~MainWindow();
+    protected:
+        void contextMenuEvent(QContextMenuEvent* event) override;
     private:
         Ui::MainWindow* ui;
         File* _lasFile;
+        QAction* _actionCut;
+        QMenu* _menu;
+        void initMenu();
+    private slots:
+            void trigger();
 
 };
 #endif // MAINWINDOW_H
