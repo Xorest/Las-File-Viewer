@@ -8,7 +8,8 @@
 
 OpenGLWidget::OpenGLWidget(QWidget* parent)
     : QOpenGLWidget(parent),
-      _zoom(-50)
+      _zoom(-2000),
+      _isContrePress(false)
 {}
 
 OpenGLWidget::~OpenGLWidget()
@@ -86,27 +87,32 @@ void OpenGLWidget::paintGL()
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     QMatrix4x4 m = _camera->viewMatrix();
-    //m.setToIdentity();
-
-    m.scale(0.2,0.2,0.2);
-    m.frustum(-5,5, -5,5, 1, 1000);
-    m.translate(0,0,_zoom);
+    m.frustum(-_zoom,_zoom, -_zoom, _zoom, 25, 10000000);
+    m.translate(-(_minPoint[0] + ((_maxPoint[0] - _minPoint[0])/2)),-(_minPoint[1] + ((_maxPoint[1] - _minPoint[1])/2)),-50);
 
 
     _shaderProgramm->bind();
     _shaderProgramm->setUniformValue("matrix", m);
-    _shaderProgramm->enableAttributeArray(0);
-    _shaderProgramm->enableAttributeArray(1);
-    _shaderProgramm->setAttributeBuffer(0, GL_FLOAT, 0, 3, 6 * sizeof(GLfloat));
-    _shaderProgramm->setAttributeBuffer(1, GL_FLOAT, 3 * sizeof(GLfloat), 3, 6 * sizeof(GLfloat));
 
-    glDrawArrays(GL_POINTS, 0, _points.size());
+    drawVbo();
+
+    if(_isContrePress)
+    {
+        drawLineLoop(&_vboLineLoop, _shaderProgramm);
+    }
+
 }
 
 void OpenGLWidget::mousePressEvent(QMouseEvent *event)
 {
     _pressed = true;
     _lastPos = event->pos();
+
+    if (event->modifiers().testFlag(Qt::ControlModifier))
+    {
+        _lastPosF.setX(((4.0 * _zoom) * event->pos().x() / width() - (2.0 * _zoom)) + (_minPoint[0] + ((_maxPoint[0] - _minPoint[0])/2)));
+        _lastPosF.setY(((2.0 * _zoom) - (4.0 * _zoom) * event->pos().y() / height()) + (_minPoint[1] + ((_maxPoint[1] - _minPoint[1])/2)));
+    }
 }
 
 void OpenGLWidget::mouseReleaseEvent(QMouseEvent *)
@@ -118,17 +124,27 @@ void OpenGLWidget::mouseMoveEvent(QMouseEvent *event)
 {
     if (!_pressed)
         return;
+    if (!event->modifiers().testFlag(Qt::ControlModifier))
+    {
+        int dx = event->pos().x() - _lastPos.x();
+        int dy = event->pos().y() - _lastPos.y();
 
-    int dx = event->pos().x() - _lastPos.x();
-    int dy = event->pos().y() - _lastPos.y();
+        if (dy)
+            _camera->pitch(dy / 10.0f);
 
-    if (dy)
-        _camera->pitch(dy / 10.0f);
+        if (dx)
+            _camera->yaw(dx / 10.0f);
 
-    if (dx)
-        _camera->yaw(dx / 10.0f);
+        _lastPos = event->pos();
+    }
+    else
+    {
+        QPointF point;
+        point.setX(((4.0 * _zoom) * event->pos().x() / width() - (2.0 * _zoom)) + (_minPoint[0] + ((_maxPoint[0] - _minPoint[0])/2)));
+        point.setY(((2.0 * _zoom) - (4.0 * _zoom) * event->pos().y() / height()) + (_minPoint[1] + ((_maxPoint[1] - _minPoint[1])/2)));
 
-    _lastPos = event->pos();
+        createVboLineLoop(&_vboLineLoop, _lastPosF, point);
+    }
 
     update();
 }
@@ -153,12 +169,28 @@ void OpenGLWidget::keyPressEvent(QKeyEvent *event)
         break;
     }
 
+    _isContrePress = event->key() == Qt::Key_Control;
+
+    update();
+}
+
+void OpenGLWidget::keyReleaseEvent(QKeyEvent *event)
+{
+    if (_isContrePress)
+    {
+        if (event->key() == Qt::Key_Control)
+        {
+            _isContrePress = false;
+            createVboLineLoop(&_vboLineLoop,0,0,0,0);
+        }
+    }
+
     update();
 }
 
 void OpenGLWidget::wheelEvent(QWheelEvent *event)
 {
-    event->angleDelta().y() < 0 ? _zoom-= 20 : _zoom+= 20;
+    event->angleDelta().y() < 0 ? _zoom-=500 : _zoom+=500;
 
     update();
 }
@@ -180,7 +212,7 @@ void OpenGLWidget::initShader()
         "varying mediump vec3 outColor;\n"
         "void main() {\n"
         "   gl_Position = matrix *vec4(position, 1.0);\n"
-        "   gl_PointSize = 3;\n"
+        "   gl_PointSize = 1;\n"
         "   outColor = color;\n"
         "}\n";
     vshader->compileSourceCode(vertexShaderSource);
@@ -204,13 +236,15 @@ void OpenGLWidget::initShader()
 void OpenGLWidget::initVBO()
 {
     QVector<GLfloat> vertData;
-    int k = 50;
 
     for (PointDataRecords* p : _points)
     {
-        vertData.append((p->x() - (_minPoint[0] + (_maxPoint[0] - _minPoint[0]) / 2)));
-        vertData.append((p->y() - (_minPoint[1] + (_maxPoint[1] - _minPoint[1]) / 2)));
-        vertData.append((p->z() - (_minPoint[2] + (_maxPoint[2] - _minPoint[2]) / 2))/100);
+//        vertData.append((p->x() - (_minPoint[0] + (_maxPoint[0] - _minPoint[0]))));
+//        vertData.append((p->y() - (_minPoint[1] + (_maxPoint[1] - _minPoint[1]))));
+//        vertData.append((p->z() - (_minPoint[2] + (_maxPoint[2] - _minPoint[2])))/10000);
+        vertData.append(p->x());
+        vertData.append(p->y());
+        vertData.append(p->z()/10000);
         vertData.append((p->red() / 655.35) * 0.01);
         vertData.append((p->green()/ 655.35) * 0.01);
         vertData.append((p->blue()/ 655.35) * 0.01);
@@ -228,4 +262,84 @@ void OpenGLWidget::initVBO()
     _vbo.create();
     _vbo.bind();
     _vbo.allocate(vertData.constData(), vertData.count() * sizeof(GLfloat));
+}
+
+void OpenGLWidget::createVboLineLoop(QOpenGLBuffer* buffer, float x, float y, float w, float h)
+{
+    float z = 0;
+    float vert[] ={x,y,z, x+w,y,z, x+w,y,z, x+w,y+h,z, x+w,y+h,z, x,y+h,z};
+    float color[] = {0.5,0.5,0};
+
+    QVector<GLfloat> vertData;
+    int count = 6;
+    int p = 0;
+
+    for (int i = 0; i < count; i++)
+    {
+        vertData.append(vert[p++]);
+        vertData.append(vert[p++]);
+        vertData.append(vert[p++]);
+        vertData.append(color[0]);
+        vertData.append(color[1]);
+        vertData.append(color[2]);
+    }
+    buffer->create();
+    buffer->bind();
+    buffer->allocate(vertData.constData(), vertData.count() * sizeof(GLfloat));
+}
+
+void OpenGLWidget::createVboLineLoop(QOpenGLBuffer* buffer, QPointF point1, QPointF point2)
+{
+    float x = point1.x();
+    float y = point1.y() ;
+    float w = (point2.x() - point1.x());
+    float h = (point2.y() - point1.y());
+    float z = 0;
+    float vert[] =
+    {
+        x,y,z, x+w,y,z, x+w,y,z, x+w,y+h,z, x+w,y+h,z, x,y+h,z
+    };
+    float color[] = {0.5,0.5,0};
+
+    QVector<GLfloat> vertData;
+    int count = 6;
+    int p = 0;
+
+    for (int i = 0; i < count; i++)
+    {
+        vertData.append(vert[p++]);
+        vertData.append(vert[p++]);
+        vertData.append(vert[p++]);
+        vertData.append(color[0]);
+        vertData.append(color[1]);
+        vertData.append(color[2]);
+    }
+
+    buffer->create();
+    buffer->bind();
+    buffer->allocate(vertData.constData(), vertData.count() * sizeof(GLfloat));
+}
+
+void OpenGLWidget::drawLineLoop(QOpenGLBuffer* buffer, QOpenGLShaderProgram* programm)
+{
+    buffer->bind();
+    programm->enableAttributeArray(0);
+    programm->enableAttributeArray(1);
+        programm->setAttributeBuffer(0, GL_FLOAT, 0, 3, 6 * sizeof(GLfloat));
+        programm->setAttributeBuffer(1, GL_FLOAT, 3 * sizeof(GLfloat), 3, 6 * sizeof(GLfloat));
+        glDrawArrays(GL_LINE_LOOP, 0, 6);
+    programm->disableAttributeArray(0);
+    programm->disableAttributeArray(1);
+}
+
+void OpenGLWidget::drawVbo()
+{
+    _vbo.bind();
+    _shaderProgramm->enableAttributeArray(0);
+    _shaderProgramm->enableAttributeArray(1);
+        _shaderProgramm->setAttributeBuffer(0, GL_FLOAT, 0, 3, 6 * sizeof(GLfloat));
+        _shaderProgramm->setAttributeBuffer(1, GL_FLOAT, 3 * sizeof(GLfloat), 3, 6 * sizeof(GLfloat));
+        glDrawArrays(GL_POINTS, 0, _points.size());
+    _shaderProgramm->disableAttributeArray(0);
+    _shaderProgramm->disableAttributeArray(1);
 }

@@ -13,6 +13,8 @@
 #include <QVector3D>
 #include <QVector>
 #include <QWidget>
+#include <QPoint>
+#include <QPointF>
 #include "pointdatarecords.h"
 #include "camera.h"
 
@@ -31,27 +33,29 @@ class OpenGLWidget : public QOpenGLWidget, protected QOpenGLFunctions
         void mouseReleaseEvent(QMouseEvent* event) override;
         void mouseMoveEvent(QMouseEvent* event) override;
         void keyPressEvent(QKeyEvent* event) override;
+        void keyReleaseEvent(QKeyEvent *event) override;
         void wheelEvent(QWheelEvent *event) override;
     private:
         QList<PointDataRecords*> _points;
         QOpenGLBuffer _vbo;
+        QOpenGLBuffer _vboLineLoop;
         QOpenGLShaderProgram* _shaderProgramm;
-        GLint _position;
-        GLint _color;
-        GLint _size;
-        QVector<QVector3D> _pointsPosion;
-        QVector<QVector3D> _pointsColor;
         QVector<int> _maxPoint;
         QVector<int> _minPoint;
-        int _matrixLoc;
         Camera* _camera;
         bool _debug;
         bool _pressed = false;
         QPoint _lastPos;
+        QPointF _lastPosF;
         int _zoom;
+        bool _isContrePress;
         void initCamera(QVector3D position);
         void initShader();
         void initVBO();
+        void createVboLineLoop(QOpenGLBuffer* buffer, float x, float y, float w, float h);
+        void createVboLineLoop(QOpenGLBuffer* buffer, QPointF point1, QPointF point2);
+        void drawLineLoop(QOpenGLBuffer* buffer, QOpenGLShaderProgram* programm);
+        void drawVbo();
 
 };
 

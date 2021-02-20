@@ -8,7 +8,7 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    QString path = "D:/art/las/lasfile1.las";
+    QString path = "D:/art/las/lasfileTree3.las";
     _lasFile = new File(path);
     ui->openGLWidget->setPointsByOpenGL(_lasFile->points());
 }
