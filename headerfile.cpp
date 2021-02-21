@@ -1,5 +1,7 @@
 #include <QDebug>
+#include <QDataStream>
 #include <iostream>
+#include <QtEndian>
 #include "headerfile.h"
 #include "converter.h"
 
@@ -16,7 +18,7 @@ HeaderFile::HeaderFile(const QByteArray &bytes)
     _versionMinor = Converter::byteToUchar(bytes.mid(25, 1));
     _systemIdentifier = QString::fromLocal8Bit(bytes.mid(26, 32));
     _generationSoftware = QString::fromLocal8Bit(bytes.mid(58, 32));
-    _fileCreateDayAndYear = Converter::byteToUInt(bytes.mid(90, 2));
+    _fileCreateDayAndYear = Converter::byteToUShort(bytes.mid(90, 2));
     _fileCreateYear = Converter::byteToUInt(bytes.mid(92, 2));
     _headerSize = Converter::byteToUInt(bytes.mid(94, 2));
     _offsetToPointData = Converter::byteToULond(bytes.mid(96, 4));
@@ -106,7 +108,7 @@ QString HeaderFile::generationSoftware()
     return _generationSoftware;
 }
 
-uint HeaderFile::fileCreateDayAndYear()
+ushort HeaderFile::fileCreateDayAndYear()
 {
     return  _fileCreateDayAndYear;
 }
@@ -239,4 +241,87 @@ void HeaderFile::setMinY(double minY)
 void HeaderFile::setMinZ(double minZ)
 {
     _minZ = minZ;
+}
+
+QByteArray HeaderFile::headerByteArray()
+{
+    QByteArray byteArray;
+
+    byteArray.append(_signatureLASF.toUtf8());
+    byteArray.append(_sourceId);
+    byteArray.append(_globalEncoding);
+    byteArray.append('\x00');
+    byteArray.append('\x00');
+    byteArray.append('\x00');
+    byteArray.append('\x00');
+    byteArray.append('\x00');
+    byteArray.append('\x00');
+    byteArray.append('\x00');
+    byteArray.append('\x00');
+    byteArray.append('\x00');
+    byteArray.append('\x00');
+    byteArray.append('\x00');
+
+    for (uchar c : qAsConst(_projectId_GUID_data_4))
+    {
+        byteArray.append(c);
+    }
+
+    byteArray.append(_versionMajor);
+    byteArray.append(_versionMinor);
+
+    QByteArray systemIdentifierArray(_systemIdentifier.toLocal8Bit());
+    byteArray.append(_systemIdentifier.toLocal8Bit());
+
+    if (systemIdentifierArray.size() < 32)
+    {
+        for (int i = systemIdentifierArray.size(); i < 32 ; i++)
+        {
+            byteArray.append('\x00');
+        }
+    }
+
+    QByteArray generationSoftwareArray(_systemIdentifier.toLocal8Bit());
+    byteArray.append(_generationSoftware.toLocal8Bit());
+
+    if (generationSoftwareArray.size() < 32)
+    {
+        for (int i = generationSoftwareArray.size(); i < 32 ; i++)
+        {
+            byteArray.append('\x00');
+        }
+    }
+
+    QByteArray data;
+    QDataStream stream(&data, QIODevice::WriteOnly);
+    stream << qToBigEndian(_fileCreateDayAndYear);
+    stream << qToBigEndian(_fileCreateYear);
+    stream << _headerSize;
+    byteArray.append(data);
+
+    byteArray.append(_offsetToPointData);
+    byteArray.append(_numberOfVariableLenghtRecords);
+    byteArray.append(_pointDataFormatId);
+    byteArray.append(_pointDataRecordLength);
+    byteArray.append(_numberOfPointRecords);
+
+    for( ulong u : qAsConst(_numberOfPointsByReturn))
+    {
+        byteArray.append(u);
+    }
+
+    byteArray.append(_scaleFactorX);
+    byteArray.append(_scaleFactorY);
+    byteArray.append(_scaleFactorZ);
+    byteArray.append(_offsetX);
+    byteArray.append(_offsetY);
+    byteArray.append(_offsetZ);
+    byteArray.append(_maxX);
+    byteArray.append(_minX);
+    byteArray.append(_maxY);
+    byteArray.append(_minY);
+    byteArray.append(_maxZ);
+    byteArray.append(_minZ);
+
+    return byteArray;
 }

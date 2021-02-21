@@ -21,7 +21,7 @@ class HeaderFile
         uchar versionMinor();
         QString systemIdentifier();
         QString generationSoftware();
-        uint fileCreateDayAndYear();
+        ushort fileCreateDayAndYear();
         uint fileCreateYear();
         uint headerSize();
         ulong offsetToPointData();
@@ -48,6 +48,7 @@ class HeaderFile
         void setMinX(double minX);
         void setMinY(double minY);
         void setMinZ(double minZ);
+        QByteArray headerByteArray();
     private:
         QString _signatureLASF;
         uint _sourceId;
@@ -60,7 +61,7 @@ class HeaderFile
         uchar _versionMinor;
         QString _systemIdentifier;
         QString _generationSoftware;
-        uint _fileCreateDayAndYear;
+        ushort _fileCreateDayAndYear;
         uint _fileCreateYear;
         uint _headerSize;
         ulong _offsetToPointData;

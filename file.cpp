@@ -41,7 +41,7 @@ void File::cutPoints(QPoint beginPoint, QPoint endPoint)
         bool var_2 = (p->x() < beginPoint.x()  && p->x() > endPoint.x() && p->y() > beginPoint.y() && p->y() < endPoint.y());
         bool var_3 = (p->x() < beginPoint.x()  && p->x() > endPoint.x() && p->y() < beginPoint.y() && p->y() > endPoint.y());
         bool var_4 = (p->x() > beginPoint.x()  && p->x() < endPoint.x() && p->y() < beginPoint.y() && p->y() > endPoint.y());
-        qDebug()<<p->x() << p->y()<<beginPoint<<endPoint;
+
         if (var_1 || var_2 || var_3 || var_4)
         {
             newPoints.append(p);
@@ -55,8 +55,10 @@ void File::cutPoints(QPoint beginPoint, QPoint endPoint)
         }
     }
 
-//    HeaderFile* newHeaderFile = _headerFile;
-
+    HeaderFile* newHeaderFile = _headerFile;
+    QFile newFile("newFile.las");
+    newFile.open(QIODevice::WriteOnly);
+    newFile.write(newHeaderFile->headerByteArray());
 
     qDebug()<<newPoints.size();
 }

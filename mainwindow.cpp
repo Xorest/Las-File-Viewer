@@ -13,7 +13,12 @@ MainWindow::MainWindow(QWidget *parent)
     ui->openGLWidget->setPointsByOpenGL(_lasFile->points());
     initMenu();
 
-    qDebug()<<_lasFile->headerFile()->headerSize()<<_lasFile->headerFile()->offsetToPointData()<<_lasFile->headerFile()->numberOfVariableLenghtRecords()<<_lasFile->headerFile()->poitDataRecordLength();
+    qDebug()<<"Размер хедера"<<_lasFile->headerFile()->headerSize();
+//    qDebug()<<"Начала байтов с точками"<<_lasFile->headerFile()->offsetToPointData();
+//    qDebug()<<_lasFile->headerFile()->numberOfVariableLenghtRecords();
+//    qDebug()<<_lasFile->headerFile()->poitDataRecordLength();
+
+
 }
 
 MainWindow::~MainWindow()
