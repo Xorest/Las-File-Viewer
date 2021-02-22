@@ -28,6 +28,7 @@ class MainWindow : public QMainWindow
         void initMenu();
     private slots:
             void trigger();
+            void PushButtonOpenClic();
 
 };
 #endif // MAINWINDOW_H

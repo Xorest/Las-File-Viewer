@@ -1,4 +1,6 @@
 #include <QString>
+#include <QPushButton>
+#include <QFileDialog>
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include <QDebug>
@@ -8,13 +10,15 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    QString path = "D:/art/las/lasfile1.las";
-    _lasFile = new File(path);
-    ui->openGLWidget->setPointsByOpenGL(_lasFile->points());
+//    QString path = "D:/art/las/lasfileTree3.las";
+//    QString path = "D:/art/las/lasfile1.las";
+//    QString path = "D:/art/diplom/LasFileViewer/build/test.las";
+//    _lasFile = new File(path);
+//    ui->openGLWidget->setPointsByOpenGL(_lasFile->points());
     initMenu();
-
-    qDebug()<<"Размер хедера"<<_lasFile->headerFile()->headerSize();
-//    qDebug()<<"Начала байтов с точками"<<_lasFile->headerFile()->offsetToPointData();
+    connect(ui->pushButtonOpen, &QPushButton::clicked, this, &MainWindow::PushButtonOpenClic);
+//    qDebug()<<"Размер хедера"<<_lasFile->headerFile()->headerSize();
+//    qDebug()<<"Начала байтов с точками"<<(int)_lasFile->headerFile()->offsetToPointData();
 //    qDebug()<<_lasFile->headerFile()->numberOfVariableLenghtRecords();
 //    qDebug()<<_lasFile->headerFile()->poitDataRecordLength();
 
@@ -41,4 +45,11 @@ void MainWindow::initMenu()
 void MainWindow::trigger()
 {
     _lasFile->cutPoints(ui->openGLWidget->cutPosBegin(),ui->openGLWidget->cutPosEnd());
+}
+
+void MainWindow::PushButtonOpenClic()
+{
+    QString path = QFileDialog::getOpenFileName();
+    _lasFile = new File(path);
+    ui->openGLWidget->setPointsByOpenGL(_lasFile->points());
 }

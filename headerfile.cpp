@@ -8,23 +8,23 @@
 HeaderFile::HeaderFile(const QByteArray &bytes)
 {
     _signatureLASF = QString::fromLocal8Bit(bytes.mid(0,4));
-    _sourceId = Converter::byteToUInt(bytes.mid(4, 2));
-    _globalEncoding = Converter::byteToUInt((bytes.mid(6, 2)));
+    _sourceId = Converter::byteToUShort(bytes.mid(4, 2));
+    _globalEncoding = Converter::byteToUShort((bytes.mid(6, 2)));
     _projectId_GUID_data_1 = Converter::byteToULond(bytes.mid(8, 4));
-    _projectId_GUID_data_2 = Converter::byteToUInt(bytes.mid(12, 2));
-    _projectId_GUID_data_3 = Converter::byteToUInt(bytes.mid(14, 2));
+    _projectId_GUID_data_2 = Converter::byteToUShort(bytes.mid(12, 2));
+    _projectId_GUID_data_3 = Converter::byteToUShort(bytes.mid(14, 2));
     _projectId_GUID_data_4 = Converter::byteToCharArray(bytes.mid(16, 8));
     _versionMajor = Converter::byteToUchar(bytes.mid(24, 1));
     _versionMinor = Converter::byteToUchar(bytes.mid(25, 1));
     _systemIdentifier = QString::fromLocal8Bit(bytes.mid(26, 32));
     _generationSoftware = QString::fromLocal8Bit(bytes.mid(58, 32));
     _fileCreateDayAndYear = Converter::byteToUShort(bytes.mid(90, 2));
-    _fileCreateYear = Converter::byteToUInt(bytes.mid(92, 2));
-    _headerSize = Converter::byteToUInt(bytes.mid(94, 2));
+    _fileCreateYear = Converter::byteToUShort(bytes.mid(92, 2));
+    _headerSize = Converter::byteToUShort(bytes.mid(94, 2));
     _offsetToPointData = Converter::byteToULond(bytes.mid(96, 4));
     _numberOfVariableLenghtRecords = Converter::byteToULond(bytes.mid(100, 4));
     _pointDataFormatId = Converter::byteToUchar(bytes.mid(104, 1));
-    _pointDataRecordLength = Converter::byteToUInt(bytes.mid(105, 2));
+    _pointDataRecordLength = Converter::byteToUShort(bytes.mid(105, 2));
     _numberOfPointRecords  = Converter::byteToULond(bytes.mid(107, 4));
 
     int pos = 111;
@@ -58,12 +58,12 @@ QString HeaderFile::signatureLASF()
     return  _signatureLASF;
 }
 
-uint HeaderFile::sourceId()
+ushort HeaderFile::sourceId()
 {
     return _sourceId;
 }
 
-uint HeaderFile::globalEncoding()
+ushort HeaderFile::globalEncoding()
 {
     return _globalEncoding;
 }
@@ -73,12 +73,12 @@ ulong HeaderFile::projectId_GUID_data_1()
     return _projectId_GUID_data_1;
 }
 
-uint HeaderFile::projectId_GUID_data_2()
+ushort HeaderFile::projectId_GUID_data_2()
 {
     return _projectId_GUID_data_2;
 }
 
-uint HeaderFile::projectId_GUID_data_3()
+ushort HeaderFile::projectId_GUID_data_3()
 {
     return _projectId_GUID_data_3;
 }
@@ -113,12 +113,12 @@ ushort HeaderFile::fileCreateDayAndYear()
     return  _fileCreateDayAndYear;
 }
 
-uint HeaderFile::fileCreateYear()
+ushort HeaderFile::fileCreateYear()
 {
     return _fileCreateYear;
 }
 
-uint HeaderFile::headerSize()
+ushort HeaderFile::headerSize()
 {
     return _headerSize;
 }
@@ -138,7 +138,7 @@ uchar HeaderFile::pointDataFormatId()
     return _pointDataFormatId;
 }
 
-uint HeaderFile::poitDataRecordLength()
+ushort HeaderFile::poitDataRecordLength()
 {
     return _pointDataRecordLength;
 }
@@ -296,32 +296,32 @@ QByteArray HeaderFile::headerByteArray()
     QDataStream stream(&data, QIODevice::WriteOnly);
     stream << qToBigEndian(_fileCreateDayAndYear);
     stream << qToBigEndian(_fileCreateYear);
-    stream << _headerSize;
-    byteArray.append(data);
+    stream << qToBigEndian(_headerSize);
 
-    byteArray.append(_offsetToPointData);
-    byteArray.append(_numberOfVariableLenghtRecords);
-    byteArray.append(_pointDataFormatId);
-    byteArray.append(_pointDataRecordLength);
-    byteArray.append(_numberOfPointRecords);
+    stream << qToBigEndian((quint32)_offsetToPointData);
+    stream << qToBigEndian((quint32)_numberOfVariableLenghtRecords);
+    stream << _pointDataFormatId;
+    stream << qToBigEndian(_pointDataRecordLength);
+    stream << qToBigEndian((quint32)_numberOfPointRecords);
 
     for( ulong u : qAsConst(_numberOfPointsByReturn))
     {
-        byteArray.append(u);
+         stream << qToBigEndian((quint32)u);
     }
 
-    byteArray.append(_scaleFactorX);
-    byteArray.append(_scaleFactorY);
-    byteArray.append(_scaleFactorZ);
-    byteArray.append(_offsetX);
-    byteArray.append(_offsetY);
-    byteArray.append(_offsetZ);
-    byteArray.append(_maxX);
-    byteArray.append(_minX);
-    byteArray.append(_maxY);
-    byteArray.append(_minY);
-    byteArray.append(_maxZ);
-    byteArray.append(_minZ);
+    stream << qToBigEndian(_scaleFactorX);
+    stream << qToBigEndian(_scaleFactorY);
+    stream << qToBigEndian(_scaleFactorZ);
+    stream << qToBigEndian(_offsetX);
+    stream << qToBigEndian(_offsetY);
+    stream << qToBigEndian(_offsetZ);
+    stream << qToBigEndian(_maxX);
+    stream << qToBigEndian(_minX);
+    stream << qToBigEndian(_maxY);
+    stream << qToBigEndian(_minY);
+    stream << qToBigEndian(_maxZ);
+    stream << qToBigEndian(_minZ);
+    byteArray.append(data);
 
     return byteArray;
 }

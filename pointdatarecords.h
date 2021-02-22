@@ -12,28 +12,29 @@ class PointDataRecords
         long x();
         long y();
         long z();
-        uint intensity();
-        QString neponyatno();
+        ushort intensity();
+        uchar neponyatno();
         uchar classification();
         uchar scanAngleRank();
         uchar userData();
-        uint pointSourceId();
-        uint red();
-        uint green();
-        uint blue();
+        ushort pointSourceId();
+        ushort red();
+        ushort green();
+        ushort blue();
+        QByteArray pointByteArray();
     private:
         long _x;
         long _y;
         long _z;
-        uint _intensity;
-        QString _neponyatno;
+        ushort _intensity;
+        uchar _neponyatno;
         uchar _classification;
         uchar _scanAngleRank;
         uchar _userData;
-        uint _pointSourceId;
-        uint _red;
-        uint _green;
-        uint _blue;
+        ushort _pointSourceId;
+        ushort _red;
+        ushort _green;
+        ushort _blue;
 };
 
 #endif // POINTDATARECORDS_H

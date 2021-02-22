@@ -8,16 +8,17 @@ class VariableLengthRecordsFile
 {
     public:
         VariableLengthRecordsFile(const QByteArray& bytes);
-        uint reserved();
+        ushort reserved();
         QString userId();
-        uint recordId();
-        uint recordLengthAfterHeader();
+        ushort recordId();
+        ushort recordLengthAfterHeader();
         QString description();
+        QByteArray variableLengthRecordsFileByteArray();
     private:
-        uint _reserved;
+        ushort _reserved;
         QString _userId;
-        uint _recordId;
-        uint _recordLengthAfterHeader;
+        ushort _recordId;
+        ushort _recordLengthAfterHeader;
         QString _description;
 };
 

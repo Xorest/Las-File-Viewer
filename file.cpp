@@ -56,11 +56,39 @@ void File::cutPoints(QPoint beginPoint, QPoint endPoint)
     }
 
     HeaderFile* newHeaderFile = _headerFile;
+    VariableLengthRecordsFile* newVariableLengthRecordsFile = _variableLengthRecordsFile;
+    QByteArray nullBytes;
+    newHeaderFile->setMaxX(maxX);
+    newHeaderFile->setMaxX(maxY);
+    newHeaderFile->setMaxX(maxZ);
+    newHeaderFile->setMinX(minX);
+    newHeaderFile->setMinX(minY);
+    newHeaderFile->setMinX(minZ);
+
+    if (newHeaderFile->headerByteArray().size() + newVariableLengthRecordsFile->variableLengthRecordsFileByteArray().size() < (int)_headerFile->offsetToPointData())
+    {
+        int  count =  (int)_headerFile->offsetToPointData() - (newHeaderFile->headerByteArray().size() + newVariableLengthRecordsFile->variableLengthRecordsFileByteArray().size());
+        for (int i = 0; i < count; i++)
+        {
+            nullBytes.append('\x00');
+        }
+    }
+//    newHeaderFile->setOffsetToPointData(newHeaderFile->headerByteArray().size() + newVariableLengthRecordsFile->variableLengthRecordsFileByteArray().size());
+
+    QByteArray pointsData;
+
+    for (PointDataRecords* p : qAsConst(newPoints))
+    {
+        pointsData.append(p->pointByteArray());
+    }
+
+
     QFile newFile("newFile.las");
     newFile.open(QIODevice::WriteOnly);
     newFile.write(newHeaderFile->headerByteArray());
-
-    qDebug()<<newPoints.size();
+    newFile.write(newVariableLengthRecordsFile->variableLengthRecordsFileByteArray());
+    newFile.write(nullBytes);
+    newFile.write(pointsData);
 }
 
 void File::readFile()

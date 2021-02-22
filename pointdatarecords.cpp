@@ -1,6 +1,8 @@
+#include <QDataStream>
+#include <QtEndian>
 #include "pointdatarecords.h"
 #include "converter.h"
-#include <QDebug>
+
 
 PointDataRecords::PointDataRecords(const QByteArray &bytes)
 {
@@ -8,10 +10,11 @@ PointDataRecords::PointDataRecords(const QByteArray &bytes)
     _y = Converter::byteToLond(bytes.mid(4, 4));
     _z = Converter::byteToLond(bytes.mid(8, 4));
     _intensity = Converter::byteToUShort(bytes.mid(12, 2));
+    _neponyatno = Converter::byteToUchar(bytes.mid(14, 1));
     _classification = Converter::byteToUchar(bytes.mid(15, 1));
     _scanAngleRank = Converter::byteToUchar(bytes.mid(16, 1));
     _userData = Converter::byteToUchar(bytes.mid(17, 1));
-    _pointSourceId = Converter::byteToUInt(bytes.mid(18, 2));
+    _pointSourceId = Converter::byteToUShort(bytes.mid(18, 2));
     _red = Converter::byteToUShort(bytes.mid(20, 2));
     _green = Converter::byteToUShort(bytes.mid(22, 2));
     _blue = Converter::byteToUShort(bytes.mid(24, 2));
@@ -32,7 +35,7 @@ long PointDataRecords::z()
     return _z;
 }
 
-uint PointDataRecords::intensity()
+ushort PointDataRecords::intensity()
 {
     return  _intensity;
 }
@@ -52,22 +55,43 @@ uchar PointDataRecords::userData()
     return _userData;
 }
 
-uint PointDataRecords::pointSourceId()
+ushort PointDataRecords::pointSourceId()
 {
     return _pointSourceId;
 }
 
-uint PointDataRecords::red()
+ushort PointDataRecords::red()
 {
     return _red;
 }
 
-uint PointDataRecords::green()
+ushort PointDataRecords::green()
 {
     return _green;
 }
 
-uint PointDataRecords::blue()
+ushort PointDataRecords::blue()
 {
     return _blue;
+}
+
+QByteArray PointDataRecords::pointByteArray()
+{
+   QByteArray byteArray;
+   QDataStream stream(&byteArray, QIODevice::WriteOnly);
+
+   stream << qToBigEndian((quint32)_x);
+   stream << qToBigEndian((quint32)_y);
+   stream << qToBigEndian((quint32)_z);
+   stream << qToBigEndian(_intensity);
+   stream << _neponyatno;
+   stream << _classification;
+   stream << _scanAngleRank;
+   stream << _userData;
+   stream << qToBigEndian(_pointSourceId);
+   stream << qToBigEndian(_red);
+   stream << qToBigEndian(_green);
+   stream << qToBigEndian(_blue);
+
+   return byteArray;
 }
