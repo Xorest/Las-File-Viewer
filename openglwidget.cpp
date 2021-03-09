@@ -9,8 +9,11 @@
 OpenGLWidget::OpenGLWidget(QWidget* parent)
     : QOpenGLWidget(parent),
       _zoom(-2000),
-      _isContrePress(false)
-{}
+      _isContrePress(false),
+      _kMoveX(0),
+      _kMoveY(0)
+{
+}
 
 OpenGLWidget::~OpenGLWidget()
 {
@@ -85,6 +88,7 @@ void OpenGLWidget::paintGL()
         QMatrix4x4 m = _camera->viewMatrix();
         m.frustum(-_zoom,_zoom, -_zoom, _zoom, 25, 10000000);
         m.translate(-(_minPoint[0] + ((_maxPoint[0] - _minPoint[0])/2)),-(_minPoint[1] + ((_maxPoint[1] - _minPoint[1])/2)),-50);
+//        m.rotate(5, 1,0,0);
 
 
         _shaderProgramm->bind();
@@ -106,8 +110,8 @@ void OpenGLWidget::mousePressEvent(QMouseEvent *event)
 
     if (event->modifiers().testFlag(Qt::ControlModifier))
     {
-        _lastPosF.setX(((4.0 * _zoom) * event->pos().x() / width() - (2.0 * _zoom)) + (_minPoint[0] + ((_maxPoint[0] - _minPoint[0])/2)));
-        _lastPosF.setY(((2.0 * _zoom) - (4.0 * _zoom) * event->pos().y() / height()) + (_minPoint[1] + ((_maxPoint[1] - _minPoint[1])/2)));
+        _lastPosF.setX(((4.0 * _zoom) * event->pos().x() / width() - (2.0 * _zoom)) + (_minPoint[0] + ((_maxPoint[0] - _minPoint[0])/2)) + (_kMoveX * -_zoom * 2));
+        _lastPosF.setY(((2.0 * _zoom) - (4.0 * _zoom) * event->pos().y() / height()) + (_minPoint[1] + ((_maxPoint[1] - _minPoint[1])/2)) + (_kMoveY * -_zoom * 2));
     }
 }
 
@@ -135,9 +139,11 @@ void OpenGLWidget::mouseMoveEvent(QMouseEvent *event)
     }
     else
     {
+
+        qDebug()<<_kMoveX << _kMoveY <<  _zoom;
         QPointF point;
-        point.setX(((4.0 * _zoom) * event->pos().x() / width() - (2.0 * _zoom)) + (_minPoint[0] + ((_maxPoint[0] - _minPoint[0])/2)));
-        point.setY(((2.0 * _zoom) - (4.0 * _zoom) * event->pos().y() / height()) + (_minPoint[1] + ((_maxPoint[1] - _minPoint[1])/2)));
+        point.setX(((4.0 * _zoom) * event->pos().x() / width() - (2.0 * _zoom)) + (_minPoint[0] + ((_maxPoint[0] - _minPoint[0])/2)) + (_kMoveX * -_zoom * 2));
+        point.setY(((2.0 * _zoom) - (4.0 * _zoom) * event->pos().y() / height()) + (_minPoint[1] + ((_maxPoint[1] - _minPoint[1])/2)) + (_kMoveY * -_zoom * 2));
 
         createVboLineLoop(&_vboLineLoop, _lastPosF, point);
 
@@ -154,15 +160,19 @@ void OpenGLWidget::keyPressEvent(QKeyEvent *event)
     switch (event->key()) {
     case Qt::Key_W:
         _camera->walk(amount);
+        _kMoveY += amount;
         break;
     case Qt::Key_S:
         _camera->walk(-amount);
+        _kMoveY -= amount;
         break;
     case Qt::Key_A:
         _camera->strafe(-amount);
+        _kMoveX += amount;
         break;
     case Qt::Key_D:
         _camera->strafe(amount);
+        _kMoveX -= amount;
         break;
     default:
         break;

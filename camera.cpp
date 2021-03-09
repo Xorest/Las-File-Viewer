@@ -2,7 +2,7 @@
 #include "camera.h"
 
 Camera::Camera(const QVector3D &pos)
-    : m_forward(0.0f, 0.0f, -1.0f),
+    : m_forward(0.0f, -1.0f, 0.0f),
       m_right(1.0f, 0.0f, 0.0f),
       m_up(0.0f, 1.0f, 0.0f),
       m_pos(pos),
@@ -27,7 +27,7 @@ void Camera::yaw(float degrees)
     m_yawMatrix.rotate(m_yaw, 0, 1, 0);
 
     QMatrix4x4 rotMat = m_pitchMatrix * m_yawMatrix;
-    m_forward = (QVector4D(0.0f, 0.0f, -1.0f, 0.0f) * rotMat).toVector3D();
+    m_forward = (QVector4D(0.0f, -1.0f, 0.0f, 0.0f) * rotMat).toVector3D();
     m_right = (QVector4D(1.0f, 0.0f, 0.0f, 0.0f) * rotMat).toVector3D();
 }
 
@@ -39,14 +39,14 @@ void Camera::pitch(float degrees)
     m_pitchMatrix.rotate(m_pitch, 1, 0, 0);
 
     QMatrix4x4 rotMat = m_pitchMatrix * m_yawMatrix;
-    m_forward = (QVector4D(0.0f, 0.0f, -1.0f, 0.0f) * rotMat).toVector3D();
+    m_forward = (QVector4D(0.0f, -1.0f, 0.0f, 0.0f) * rotMat).toVector3D();
     m_up = (QVector4D(0.0f, 1.0f, 0.0f, 0.0f) * rotMat).toVector3D();
 }
 
 void Camera::walk(float amount)
 {
     m_pos[0] += amount * m_forward.x();
-    m_pos[2] += amount * m_forward.z();
+    m_pos[1] += amount * m_forward.y();
 }
 
 void Camera::strafe(float amount)

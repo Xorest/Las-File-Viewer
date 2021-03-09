@@ -29,6 +29,7 @@ class MainWindow : public QMainWindow
     private slots:
             void trigger();
             void PushButtonOpenClic();
+            void PushButtonBreakClic();
 
 };
 #endif // MAINWINDOW_H

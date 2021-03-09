@@ -11,6 +11,7 @@
 
 #include <QtCore/QVariant>
 #include <QtWidgets/QApplication>
+#include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QMainWindow>
 #include <QtWidgets/QMenuBar>
 #include <QtWidgets/QPushButton>
@@ -27,7 +28,9 @@ public:
     QWidget *centralwidget;
     QVBoxLayout *verticalLayout;
     OpenGLWidget *openGLWidget;
-    QPushButton *pushButton;
+    QHBoxLayout *horizontalLayout;
+    QPushButton *pushButtonBreak;
+    QPushButton *pushButtonOpen;
     QMenuBar *menubar;
     QStatusBar *statusbar;
 
@@ -43,14 +46,29 @@ public:
         verticalLayout->setObjectName(QString::fromUtf8("verticalLayout"));
         openGLWidget = new OpenGLWidget(centralwidget);
         openGLWidget->setObjectName(QString::fromUtf8("openGLWidget"));
+        QSizePolicy sizePolicy(QSizePolicy::Preferred, QSizePolicy::Expanding);
+        sizePolicy.setHorizontalStretch(0);
+        sizePolicy.setVerticalStretch(0);
+        sizePolicy.setHeightForWidth(openGLWidget->sizePolicy().hasHeightForWidth());
+        openGLWidget->setSizePolicy(sizePolicy);
         openGLWidget->setFocusPolicy(Qt::ClickFocus);
 
         verticalLayout->addWidget(openGLWidget);
 
-        pushButton = new QPushButton(centralwidget);
-        pushButton->setObjectName(QString::fromUtf8("pushButton"));
+        horizontalLayout = new QHBoxLayout();
+        horizontalLayout->setObjectName(QString::fromUtf8("horizontalLayout"));
+        pushButtonBreak = new QPushButton(centralwidget);
+        pushButtonBreak->setObjectName(QString::fromUtf8("pushButtonBreak"));
 
-        verticalLayout->addWidget(pushButton);
+        horizontalLayout->addWidget(pushButtonBreak);
+
+        pushButtonOpen = new QPushButton(centralwidget);
+        pushButtonOpen->setObjectName(QString::fromUtf8("pushButtonOpen"));
+
+        horizontalLayout->addWidget(pushButtonOpen);
+
+
+        verticalLayout->addLayout(horizontalLayout);
 
         MainWindow->setCentralWidget(centralwidget);
         menubar = new QMenuBar(MainWindow);
@@ -69,7 +87,8 @@ public:
     void retranslateUi(QMainWindow *MainWindow)
     {
         MainWindow->setWindowTitle(QCoreApplication::translate("MainWindow", "MainWindow", nullptr));
-        pushButton->setText(QCoreApplication::translate("MainWindow", "PushButton", nullptr));
+        pushButtonBreak->setText(QCoreApplication::translate("MainWindow", "\320\240\320\260\320\267\320\261\320\270\321\202\321\214 \320\261\320\276\320\273\321\214\321\210\320\276\320\271 Las \321\204\320\260\320\271\320\273", nullptr));
+        pushButtonOpen->setText(QCoreApplication::translate("MainWindow", "\320\236\321\202\320\272\321\200\321\213\321\202\321\214", nullptr));
     } // retranslateUi
 
 };

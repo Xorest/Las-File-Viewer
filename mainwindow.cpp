@@ -4,25 +4,26 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include <QDebug>
+#include <pcl/2d/convolution.h>
+#include <pcl/2d/edge.h>
+#include <pcl/2d/kernel.h>
+#include <pcl/2d/morphology.h>
+#include <pcl/pcl_base.h>
+#include <pcl/point_types.h>
+
+using namespace pcl;
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-//    QString path = "D:/art/las/lasfileTree3.las";
-//    QString path = "D:/art/las/lasfile1.las";
-//    QString path = "D:/art/diplom/LasFileViewer/build/test.las";
-//    _lasFile = new File(path);
-//    ui->openGLWidget->setPointsByOpenGL(_lasFile->points());
     initMenu();
     connect(ui->pushButtonOpen, &QPushButton::clicked, this, &MainWindow::PushButtonOpenClic);
-//    qDebug()<<"Размер хедера"<<_lasFile->headerFile()->headerSize();
-//    qDebug()<<"Начала байтов с точками"<<(int)_lasFile->headerFile()->offsetToPointData();
-//    qDebug()<<_lasFile->headerFile()->numberOfVariableLenghtRecords();
-//    qDebug()<<_lasFile->headerFile()->poitDataRecordLength();
+    connect(ui->pushButtonBreak, &QPushButton::clicked, this, &MainWindow::PushButtonBreakClic);
 
-
+//    Edge<pcl::PointXYZRGB> edge;
+//    pcl::PointCloud<pcl::PointXYZRGB>::Ptr input_cloud(new pcl::PointCloud<pcl::PointXYZRGB>);
 }
 
 MainWindow::~MainWindow()
@@ -52,4 +53,12 @@ void MainWindow::PushButtonOpenClic()
     QString path = QFileDialog::getOpenFileName();
     _lasFile = new File(path);
     ui->openGLWidget->setPointsByOpenGL(_lasFile->points());
+}
+
+void MainWindow::PushButtonBreakClic()
+{
+    QString path = QFileDialog::getOpenFileName();
+    _lasFile = new File(path);
+    _lasFile->cutPoints();
+
 }

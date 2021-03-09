@@ -16,6 +16,7 @@ class File
         VariableLengthRecordsFile* variableLengthRecordsFile();
         QList<PointDataRecords*> points();
         void cutPoints(QPoint beginPoint, QPoint endPoint);
+        void cutPoints();
     private:
         QString _pathFile;
         HeaderFile* _headerFile;

@@ -53,6 +53,7 @@ class OpenGLWidget : public QOpenGLWidget, protected QOpenGLFunctions
         int _zoom;
         bool _isContrePress;
         QPoint _cutPosBegin, _cutPosEnd;
+        float _kMoveX, _kMoveY;
         QAction cutAction;
         void initCamera(QVector3D position);
         void initShader();
