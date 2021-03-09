@@ -3,6 +3,7 @@
 #include <QMatrix4x4>
 #include <QPainter>
 #include <QMouseEvent>
+#include <QCursor>
 #include "openglwidget.h"
 
 
@@ -11,13 +12,24 @@ OpenGLWidget::OpenGLWidget(QWidget* parent)
       _zoom(-2000),
       _isContrePress(false),
       _kMoveX(0),
-      _kMoveY(0)
+      _kMoveY(0),
+      _isDeletePoints(false)
 {
 }
 
 OpenGLWidget::~OpenGLWidget()
 {
 
+}
+
+QList<PointDataRecords*> OpenGLWidget::points()
+{
+    if (!_points.isEmpty())
+    {
+        return _points;
+    }
+
+    return QList<PointDataRecords*>();
 }
 
 void OpenGLWidget::setPointsByOpenGL(QList<PointDataRecords*> points)
@@ -64,6 +76,21 @@ QPoint OpenGLWidget::cutPosEnd()
     return _cutPosEnd;
 }
 
+void OpenGLWidget::deletePoints()
+{
+    _isDeletePoints = !_isDeletePoints;
+
+    if (_isDeletePoints)
+    {
+        QCursor cursorTarget = QCursor(QPixmap(":/mouse/icon/coursore_1.png"));
+        this->setCursor(cursorTarget);
+    }
+    else
+    {
+        this->setCursor(Qt::ArrowCursor);
+    }
+}
+
 void OpenGLWidget::initializeGL()
 {
     initializeOpenGLFunctions();
@@ -108,10 +135,9 @@ void OpenGLWidget::mousePressEvent(QMouseEvent *event)
     _pressed = true;
     _lastPos = event->pos();
 
-    if (event->modifiers().testFlag(Qt::ControlModifier))
+    if (event->modifiers().testFlag(Qt::ControlModifier) && (event->buttons() == Qt::LeftButton))
     {
-        _lastPosF.setX(((4.0 * _zoom) * event->pos().x() / width() - (2.0 * _zoom)) + (_minPoint[0] + ((_maxPoint[0] - _minPoint[0])/2)) + (_kMoveX * -_zoom * 2));
-        _lastPosF.setY(((2.0 * _zoom) - (4.0 * _zoom) * event->pos().y() / height()) + (_minPoint[1] + ((_maxPoint[1] - _minPoint[1])/2)) + (_kMoveY * -_zoom * 2));
+        _lastPosF = currentOpenGLPosition(event->pos());
     }
 }
 
@@ -124,31 +150,46 @@ void OpenGLWidget::mouseMoveEvent(QMouseEvent *event)
 {
     if (!_pressed)
         return;
-    if (!event->modifiers().testFlag(Qt::ControlModifier))
+    if (!_isDeletePoints)
     {
-        int dx = event->pos().x() - _lastPos.x();
-        int dy = event->pos().y() - _lastPos.y();
+        if (!event->modifiers().testFlag(Qt::ControlModifier))
+        {
+            int dx = event->pos().x() - _lastPos.x();
+            int dy = event->pos().y() - _lastPos.y();
 
-        if (dy)
-            _camera->pitch(dy / 10.0f);
+            if (dy)
+                _camera->pitch(dy / 10.0f);
 
-        if (dx)
-            _camera->yaw(dx / 10.0f);
+            if (dx)
+                _camera->yaw(dx / 10.0f);
 
-        _lastPos = event->pos();
+            _lastPos = event->pos();
+        }
+        else if (event->modifiers().testFlag(Qt::ControlModifier) && (event->buttons() == Qt::LeftButton))
+        {
+            QPointF point = currentOpenGLPosition(event->pos());
+            createVboLineLoop(&_vboLineLoop, _lastPosF, point);
+            _cutPosBegin = _lastPosF.toPoint();
+            _cutPosEnd = point.toPoint();
+        }
     }
     else
     {
+        QPointF point = currentOpenGLPosition(event->pos());
 
-        qDebug()<<_kMoveX << _kMoveY <<  _zoom;
-        QPointF point;
-        point.setX(((4.0 * _zoom) * event->pos().x() / width() - (2.0 * _zoom)) + (_minPoint[0] + ((_maxPoint[0] - _minPoint[0])/2)) + (_kMoveX * -_zoom * 2));
-        point.setY(((2.0 * _zoom) - (4.0 * _zoom) * event->pos().y() / height()) + (_minPoint[1] + ((_maxPoint[1] - _minPoint[1])/2)) + (_kMoveY * -_zoom * 2));
+        for (PointDataRecords* p : _points)
+        {
 
-        createVboLineLoop(&_vboLineLoop, _lastPosF, point);
+            int radius = -_zoom / 10;
+            bool condition1 = (point.x() - radius < p->x() && point.x() + radius > p->x() && point.y() - radius < p->y() && point.y() + radius > p->y());
 
-        _cutPosBegin = _lastPosF.toPoint();
-        _cutPosEnd = point.toPoint();
+            if (condition1)
+            {
+                _points.removeOne(p);
+            }
+        }
+
+        initVBO();
     }
 
     update();
@@ -159,12 +200,12 @@ void OpenGLWidget::keyPressEvent(QKeyEvent *event)
     const float amount = event->modifiers().testFlag(Qt::ShiftModifier) ? 1.0f : 0.1f;
     switch (event->key()) {
     case Qt::Key_W:
-        _camera->walk(amount);
-        _kMoveY += amount;
-        break;
-    case Qt::Key_S:
         _camera->walk(-amount);
         _kMoveY -= amount;
+        break;
+    case Qt::Key_S:
+        _camera->walk(amount);
+        _kMoveY += amount;
         break;
     case Qt::Key_A:
         _camera->strafe(-amount);
@@ -199,8 +240,7 @@ void OpenGLWidget::keyReleaseEvent(QKeyEvent *event)
 
 void OpenGLWidget::wheelEvent(QWheelEvent *event)
 {
-    event->angleDelta().y() < 0 ? _zoom-=500 : _zoom+=500;
-
+    event->angleDelta().y() < 0 ? _zoom-=250 : _zoom+=250;
     update();
 }
 
@@ -255,8 +295,7 @@ void OpenGLWidget::initVBO()
         vertData.append((p->green()/ 655.35) * 0.01);
         vertData.append((p->blue()/ 655.35) * 0.01);
     }
-
-    _points.size() > 30 ? qDebug()<< _points.size():qDebug()<<vertData;
+//    _points.size() > 30 ? qDebug()<< _points.size():qDebug()<<vertData;
 
     _vbo.create();
     _vbo.bind();
@@ -298,7 +337,7 @@ void OpenGLWidget::createVboLineLoop(QOpenGLBuffer* buffer, QPointF point1, QPoi
     {
         x,y,z, x+w,y,z, x+w,y,z, x+w,y+h,z, x+w,y+h,z, x,y+h,z
     };
-    float color[] = {0.9,0.9,0};
+    float color[] = {0.5,0,0};
 
     QVector<GLfloat> vertData;
     int count = 6;
@@ -341,4 +380,13 @@ void OpenGLWidget::drawVbo()
         glDrawArrays(GL_POINTS, 0, _points.size());
     _shaderProgramm->disableAttributeArray(0);
     _shaderProgramm->disableAttributeArray(1);
+}
+
+QPointF OpenGLWidget::currentOpenGLPosition(QPoint mousePosition)
+{
+    QPointF point;
+    point.setX(((4.0 * _zoom) * mousePosition.x() / width() - (2.0 * _zoom)) + (_minPoint[0] + ((_maxPoint[0] - _minPoint[0])/2)) + (_kMoveX * -_zoom * 2));
+    point.setY(((2.0 * _zoom) - (4.0 * _zoom) * mousePosition.y() / height()) + (_minPoint[1] + ((_maxPoint[1] - _minPoint[1])/2)) + (_kMoveY * -_zoom * 2));
+
+    return point;
 }

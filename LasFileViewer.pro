@@ -43,16 +43,19 @@ qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
-win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../../boost/mingw/lib/ -llibboost_date_time-mgw8-mt-d-x32-1_75.dll
-else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../../boost/mingw/lib/ -llibboost_date_time-mgw8-mt-d-x32-1_75.dlld
+#win32:CONFIG(release, debug|release): LIBS += -L$$PWD/../../boost/mingw/lib/ -llibboost_date_time-mgw8-mt-d-x32-1_75.dll
+#else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/../../boost/mingw/lib/ -llibboost_date_time-mgw8-mt-d-x32-1_75.dlld
 
-INCLUDEPATH += $$PWD/../../boost/mingw/include/boost-1_75
-DEPENDPATH += $$PWD/../../boost/mingw/include/boost-1_75
+#INCLUDEPATH += $$PWD/../../boost/mingw/include/boost-1_75
+#DEPENDPATH += $$PWD/../../boost/mingw/include/boost-1_75
 
-win32:CONFIG(release, debug|release): LIBS += -L'C:/Program Files/PCL 1.11.1/lib/' -lpcl_common
-else:win32:CONFIG(debug, debug|release): LIBS += -L'C:/Program Files/PCL 1.11.1/lib/' -lpcl_commond
+#win32:CONFIG(release, debug|release): LIBS += -L'C:/Program Files/PCL 1.11.1/lib/' -lpcl_common
+#else:win32:CONFIG(debug, debug|release): LIBS += -L'C:/Program Files/PCL 1.11.1/lib/' -lpcl_commond
 
-INCLUDEPATH += 'C:/Program Files/PCL 1.11.1/include/pcl-1.11'
-DEPENDPATH += 'C:/Program Files/PCL 1.11.1/include/pcl-1.11'
+#INCLUDEPATH += 'C:/Program Files/PCL 1.11.1/include/pcl-1.11'
+#DEPENDPATH += 'C:/Program Files/PCL 1.11.1/include/pcl-1.11'
 
-INCLUDEPATH +='C:\Program Files\Eigen'
+#INCLUDEPATH +='C:\Program Files\Eigen'
+
+RESOURCES += \
+    resourse.qrc

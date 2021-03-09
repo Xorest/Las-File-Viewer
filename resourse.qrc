@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/mouse">
+        <file>icon/coursore_1.png</file>
+    </qresource>
+</RCC>

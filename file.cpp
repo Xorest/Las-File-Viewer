@@ -1,4 +1,5 @@
 #include <QFile>
+#include <QFileDialog>
 #include <QDebug>
 #include "file.h"
 
@@ -38,12 +39,12 @@ void File::cutPoints(QPoint beginPoint, QPoint endPoint)
 
     for (PointDataRecords* p : qAsConst(_points))
     {
-        bool var_1 = (p->x() > beginPoint.x()  && p->x() < endPoint.x() && p->y() > beginPoint.y() && p->y() < endPoint.y());
-        bool var_2 = (p->x() < beginPoint.x()  && p->x() > endPoint.x() && p->y() > beginPoint.y() && p->y() < endPoint.y());
-        bool var_3 = (p->x() < beginPoint.x()  && p->x() > endPoint.x() && p->y() < beginPoint.y() && p->y() > endPoint.y());
-        bool var_4 = (p->x() > beginPoint.x()  && p->x() < endPoint.x() && p->y() < beginPoint.y() && p->y() > endPoint.y());
+        bool condition1 = (p->x() > beginPoint.x()  && p->x() < endPoint.x() && p->y() > beginPoint.y() && p->y() < endPoint.y());
+        bool condition2 = (p->x() < beginPoint.x()  && p->x() > endPoint.x() && p->y() > beginPoint.y() && p->y() < endPoint.y());
+        bool condition3 = (p->x() < beginPoint.x()  && p->x() > endPoint.x() && p->y() < beginPoint.y() && p->y() > endPoint.y());
+        bool condition4 = (p->x() > beginPoint.x()  && p->x() < endPoint.x() && p->y() < beginPoint.y() && p->y() > endPoint.y());
 
-        if (var_1 || var_2 || var_3 || var_4)
+        if (condition1 || condition2 || condition3 || condition4)
         {
             pointsData.append(p->pointByteArray());
             maxX = maxX < p->x() ? p->x() : maxX;
@@ -68,6 +69,7 @@ void File::cutPoints(QPoint beginPoint, QPoint endPoint)
     if (newHeaderFile->headerByteArray().size() + newVariableLengthRecordsFile->variableLengthRecordsFileByteArray().size() < (int)_headerFile->offsetToPointData())
     {
         int  count =  (int)_headerFile->offsetToPointData() - (newHeaderFile->headerByteArray().size() + newVariableLengthRecordsFile->variableLengthRecordsFileByteArray().size());
+
         for (int i = 0; i < count; i++)
         {
             nullBytes.append('\x00');
@@ -151,6 +153,67 @@ void File::cutPoints()
     }
 }
 
+void File::save(QList<PointDataRecords *> points)
+{
+    QByteArray pointsData;
+
+    int minX, minY, minZ, maxX, maxY, maxZ;
+    minX = _points[0]->x();
+    minY = _points[0]->y();
+    minZ = _points[0]->z();
+    maxX = _points[0]->x();
+    maxY = _points[0]->y();
+    maxZ = _points[0]->z();
+
+
+    for (PointDataRecords* p : qAsConst(points))
+    {
+        pointsData.append(p->pointByteArray());
+        maxX = maxX < p->x() ? p->x() : maxX;
+        maxY = maxY < p->y() ? p->y() : maxY;
+        maxZ = maxZ < p->z() ? p->z() : maxZ;
+        minX = minX > p->x() ? p->x() : minX;
+        minY = minY > p->y() ? p->y() : minY;
+        minZ = minZ > p->z() ? p->z() : minZ;
+    }
+
+    HeaderFile* newHeaderFile = _headerFile;
+    VariableLengthRecordsFile* newVariableLengthRecordsFile = _variableLengthRecordsFile;
+    QByteArray nullBytes;
+    newHeaderFile->setMaxX(maxX);
+    newHeaderFile->setMaxX(maxY);
+    newHeaderFile->setMaxX(maxZ);
+    newHeaderFile->setMinX(minX);
+    newHeaderFile->setMinX(minY);
+    newHeaderFile->setMinX(minZ);
+
+    savingLasFile(newHeaderFile, newVariableLengthRecordsFile, pointsData);
+}
+
+void File::savingLasFile(HeaderFile* newHeaderFile, VariableLengthRecordsFile* newVariableLengthRecordsFile, QByteArray pointsData)
+{
+
+    QString nameNewFile = QFileDialog::getSaveFileName();
+    QByteArray nullBytes;
+
+    if (newHeaderFile->headerByteArray().size() + newVariableLengthRecordsFile->variableLengthRecordsFileByteArray().size() < (int)_headerFile->offsetToPointData())
+    {
+        int  count =  (int)_headerFile->offsetToPointData() - (newHeaderFile->headerByteArray().size() + newVariableLengthRecordsFile->variableLengthRecordsFileByteArray().size());
+
+        for (int i = 0; i < count; i++)
+        {
+            nullBytes.append('\x00');
+        }
+    }
+
+    QFile newFile(nameNewFile + ".las");
+    newFile.open(QIODevice::WriteOnly);
+    newFile.write(newHeaderFile->headerByteArray());
+    newFile.write(newVariableLengthRecordsFile->variableLengthRecordsFileByteArray());
+    newFile.write(nullBytes);
+    newFile.write(pointsData);
+}
+
 void File::readFile()
 {
     QFile file(_pathFile);
@@ -162,8 +225,6 @@ void File::readFile()
         _variableLengthRecordsFile = new VariableLengthRecordsFile(localByteArray.mid(_headerFile->headerSize(), 54));
         _points = getPoints(localByteArray.mid(_headerFile->offsetToPointData()));
         file.close();
-
-        qDebug()<<_points.size();
     }
 }
 

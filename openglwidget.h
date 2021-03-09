@@ -26,9 +26,11 @@ class OpenGLWidget : public QOpenGLWidget, protected QOpenGLFunctions
     public:
         OpenGLWidget(QWidget* parent);
         ~OpenGLWidget() override;
+        QList<PointDataRecords*> points();
         void setPointsByOpenGL(QList<PointDataRecords*> points);
         QPoint cutPosBegin();
         QPoint cutPosEnd();
+        void deletePoints();
     protected:
         void initializeGL() override;
         void paintGL() override;
@@ -54,6 +56,7 @@ class OpenGLWidget : public QOpenGLWidget, protected QOpenGLFunctions
         bool _isContrePress;
         QPoint _cutPosBegin, _cutPosEnd;
         float _kMoveX, _kMoveY;
+        bool _isDeletePoints;
         QAction cutAction;
         void initCamera(QVector3D position);
         void initShader();
@@ -62,6 +65,8 @@ class OpenGLWidget : public QOpenGLWidget, protected QOpenGLFunctions
         void createVboLineLoop(QOpenGLBuffer* buffer, QPointF point1, QPointF point2);
         void drawLineLoop(QOpenGLBuffer* buffer, QOpenGLShaderProgram* programm);
         void drawVbo();
+        QPointF currentOpenGLPosition(QPoint mousePosition);
+
 
 };
 
