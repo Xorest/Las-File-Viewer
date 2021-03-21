@@ -2,6 +2,7 @@
 #include <QDataStream>
 #include <iostream>
 #include <QtEndian>
+#include <QIODevice>
 #include "headerfile.h"
 #include "converter.h"
 

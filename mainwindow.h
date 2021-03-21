@@ -32,6 +32,6 @@ class MainWindow : public QMainWindow
             void pushButtonBreakClic();
             void deletePoints();
             void save();
-
+            void savePCD();
 };
 #endif // MAINWINDOW_H

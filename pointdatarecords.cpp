@@ -1,5 +1,6 @@
 #include <QDataStream>
 #include <QtEndian>
+#include <QIODevice>
 #include "pointdatarecords.h"
 #include "converter.h"
 

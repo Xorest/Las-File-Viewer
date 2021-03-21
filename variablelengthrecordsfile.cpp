@@ -1,5 +1,6 @@
 #include <QDataStream>
 #include <QtEndian>
+#include <QIODevice>
 #include "variablelengthrecordsfile.h"
 #include "converter.h"
 

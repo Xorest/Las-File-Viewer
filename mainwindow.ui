@@ -14,7 +14,7 @@
    <enum>Qt::ClickFocus</enum>
   </property>
   <property name="windowTitle">
-   <string>MainWindow</string>
+   <string>Las File Viewer</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QVBoxLayout" name="verticalLayout">
@@ -64,7 +64,7 @@
     <bool>false</bool>
    </property>
    <property name="text">
-    <string>Удаление лишних точек</string>
+    <string>Ластик</string>
    </property>
   </action>
   <action name="actionSave">

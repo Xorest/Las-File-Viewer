@@ -4,6 +4,9 @@
 #include <QPainter>
 #include <QMouseEvent>
 #include <QCursor>
+#include <QtMath>
+#include <QColor>
+#include <QPalette>
 #include "openglwidget.h"
 
 
@@ -105,7 +108,7 @@ void OpenGLWidget::paintGL()
 {
     QPainter painter(this);
     painter.setClipRect(contentsRect(), Qt::IntersectClip);
-    QColor bg = palette().color(QPalette::Background);
+    QColor bg = palette().color(QPalette::Window);
 
     glClearColor(bg.redF(), bg.greenF(), bg.blueF(), bg.alphaF());
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -180,10 +183,11 @@ void OpenGLWidget::mouseMoveEvent(QMouseEvent *event)
         for (PointDataRecords* p : _points)
         {
 
-            int radius = -_zoom / 10;
-            bool condition1 = (point.x() - radius < p->x() && point.x() + radius > p->x() && point.y() - radius < p->y() && point.y() + radius > p->y());
+            int radius = -_zoom / 25;
+            bool condition = !((qPow(((p->x()) - point.x()), 2) + qPow(((p->y()) - point.y()), 2) >qPow(radius ,2)));
+            //bool condition1 = (point.x() - radius < p->x() && point.x() + radius > p->x() && point.y() - radius < p->y() && point.y() + radius > p->y());
 
-            if (condition1)
+            if (condition)
             {
                 _points.removeOne(p);
             }
@@ -290,7 +294,10 @@ void OpenGLWidget::initVBO()
     {
         vertData.append(p->x());
         vertData.append(p->y());
-        vertData.append(p->z()/10000);
+
+        //float z = (p->z() - _minPoint[2])/700; //3D визуализация
+        vertData.append(0);
+//        vertData.append(p->z()/10000);
         vertData.append((p->red() / 655.35) * 0.01);
         vertData.append((p->green()/ 655.35) * 0.01);
         vertData.append((p->blue()/ 655.35) * 0.01);

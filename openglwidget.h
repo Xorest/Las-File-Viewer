@@ -45,8 +45,8 @@ class OpenGLWidget : public QOpenGLWidget, protected QOpenGLFunctions
         QOpenGLBuffer _vbo;
         QOpenGLBuffer _vboLineLoop;
         QOpenGLShaderProgram* _shaderProgramm;
-        QVector<int> _maxPoint;
-        QVector<int> _minPoint;
+        QVector<int> _maxPoint; //[0] - X, [1] - Y, [2] - Z
+        QVector<int> _minPoint; //[0] - X, [1] - Y, [2] - Z
         Camera* _camera;
         bool _debug;
         bool _pressed = false;
