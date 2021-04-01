@@ -23,6 +23,7 @@ SOURCES += \
     mainwindow.cpp \
     openglwidget.cpp \
     pointdatarecords.cpp \
+    treatmentcgal.cpp \
     variablelengthrecordsfile.cpp
 
 HEADERS += \
@@ -33,6 +34,7 @@ HEADERS += \
     mainwindow.h \
     openglwidget.h \
     pointdatarecords.h \
+    treatmentcgal.h \
     variablelengthrecordsfile.h
 
 FORMS += \
@@ -47,3 +49,20 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 
 RESOURCES += \
     resourse.qrc
+
+INCLUDEPATH += "D:\boost"
+
+INCLUDEPATH += 'C:/Program Files (x86)/CGAL/include'
+DEPENDPATH += 'C:/Program Files (x86)/CGAL/include'
+
+win32: LIBS += -L'C:/Program Files (x86)/CGAL/lib/' -lCGAL_Core.dll
+else:win32-g++: PRE_TARGETDEPS += 'C:/Program Files (x86)/CGAL/lib/liblibCGAL_Core.dll.a'
+
+win32: LIBS += -L'C:/Program Files (x86)/CGAL/lib/' -lCGAL_ImageIO.dll
+else:win32-g++: PRE_TARGETDEPS += 'C:/Program Files (x86)/CGAL/lib/liblibCGAL_ImageIO.dll.a'
+
+win32: LIBS += -L'C:/Program Files (x86)/CGAL/lib/' -lCGAL_Qt5.dll
+else:win32-g++: PRE_TARGETDEPS += 'C:/Program Files (x86)/CGAL/lib/liblibCGAL_Qt5.dll.a'
+
+win32: LIBS += -L'C:/Program Files (x86)/CGAL/lib/' -lCGAL.dll
+else:win32-g++: PRE_TARGETDEPS += 'C:/Program Files (x86)/CGAL/lib/liblibCGAL.dll.a'

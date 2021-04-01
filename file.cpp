@@ -179,7 +179,7 @@ void File::save(QList<PointDataRecords *> points)
 
     HeaderFile* newHeaderFile = _headerFile;
     VariableLengthRecordsFile* newVariableLengthRecordsFile = _variableLengthRecordsFile;
-    QByteArray nullBytes;
+
     newHeaderFile->setMaxX(maxX);
     newHeaderFile->setMaxX(maxY);
     newHeaderFile->setMaxX(maxZ);
@@ -206,12 +206,17 @@ void File::savingLasFile(HeaderFile* newHeaderFile, VariableLengthRecordsFile* n
         }
     }
 
-    QFile newFile(nameNewFile + ".las");
+    QFile newFile(nameNewFile.mid(nameNewFile.size() - 4, 4) == ".las" ? nameNewFile : nameNewFile + ".las");
     newFile.open(QIODevice::WriteOnly);
     newFile.write(newHeaderFile->headerByteArray());
     newFile.write(newVariableLengthRecordsFile->variableLengthRecordsFileByteArray());
     newFile.write(nullBytes);
     newFile.write(pointsData);
+}
+
+void File::setPoints(QList<PointDataRecords*> points)
+{
+    _points = points;
 }
 
 void File::readFile()

@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'mainwindow.ui'
 **
-** Created by: Qt User Interface Compiler version 5.15.2
+** Created by: Qt User Interface Compiler version 6.0.2
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
@@ -10,7 +10,7 @@
 #define UI_MAINWINDOW_H
 
 #include <QtCore/QVariant>
-#include <QtWidgets/QAction>
+#include <QtGui/QAction>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QMainWindow>
 #include <QtWidgets/QMenu>
@@ -28,6 +28,7 @@ public:
     QAction *actionDletePoints;
     QAction *actionSave;
     QAction *actionOpen;
+    QAction *actionRemoveOutliers;
     QWidget *centralwidget;
     QVBoxLayout *verticalLayout;
     OpenGLWidget *openGLWidget;
@@ -50,6 +51,9 @@ public:
         actionSave->setEnabled(false);
         actionOpen = new QAction(MainWindow);
         actionOpen->setObjectName(QString::fromUtf8("actionOpen"));
+        actionRemoveOutliers = new QAction(MainWindow);
+        actionRemoveOutliers->setObjectName(QString::fromUtf8("actionRemoveOutliers"));
+        actionRemoveOutliers->setEnabled(false);
         centralwidget = new QWidget(MainWindow);
         centralwidget->setObjectName(QString::fromUtf8("centralwidget"));
         verticalLayout = new QVBoxLayout(centralwidget);
@@ -81,6 +85,7 @@ public:
         menubar->addAction(menu_2->menuAction());
         menubar->addAction(menu->menuAction());
         menu->addAction(actionDletePoints);
+        menu->addAction(actionRemoveOutliers);
         menu_2->addAction(actionSave);
         menu_2->addAction(actionOpen);
 
@@ -95,6 +100,7 @@ public:
         actionDletePoints->setText(QCoreApplication::translate("MainWindow", "\320\233\320\260\321\201\321\202\320\270\320\272", nullptr));
         actionSave->setText(QCoreApplication::translate("MainWindow", "\320\241\320\276\321\205\321\200\320\260\320\275\320\270\321\202\321\214", nullptr));
         actionOpen->setText(QCoreApplication::translate("MainWindow", "\320\236\321\202\320\272\321\200\321\213\321\202\321\214", nullptr));
+        actionRemoveOutliers->setText(QCoreApplication::translate("MainWindow", "\320\243\320\264\320\260\320\273\320\265\320\275\320\270\320\265 \321\210\321\203\320\274\320\276\320\262", nullptr));
         menu->setTitle(QCoreApplication::translate("MainWindow", "\320\230\320\275\321\201\321\202\321\200\321\203\320\274\320\265\320\275\321\202\321\213", nullptr));
         menu_2->setTitle(QCoreApplication::translate("MainWindow", "\320\244\320\260\320\271\320\273", nullptr));
     } // retranslateUi

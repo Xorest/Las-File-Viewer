@@ -5,6 +5,7 @@
 #include <QList>
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include "treatmentcgal.h"
 #include <QDebug>
 //#include <pcl/pcl_base.h>
 //#include <pcl/impl/point_types.hpp>
@@ -40,6 +41,7 @@ void MainWindow::initMenu()
     connect(ui->actionDletePoints, &QAction::triggered, this, &MainWindow::deletePoints);
     connect(ui->actionSave, &QAction::triggered, this, &MainWindow::save);
     connect(ui->actionOpen, &QAction::triggered, this, &MainWindow::open);
+    connect(ui->actionRemoveOutliers, &QAction::triggered, this, &MainWindow::removeOutliers);
 }
 void MainWindow::trigger()
 {
@@ -58,6 +60,7 @@ void MainWindow::open()
     ui->openGLWidget->setPointsByOpenGL(_lasFile->points());
     ui->actionSave->setEnabled(true);
     ui->actionDletePoints->setEnabled(true);
+    ui->actionRemoveOutliers->setEnabled(true);
 }
 
 void MainWindow::pushButtonBreakClic()
@@ -78,31 +81,10 @@ void MainWindow::save()
     _lasFile->save(ui->openGLWidget->points());
 }
 
-void MainWindow::savePCD()
+void MainWindow::removeOutliers()
 {
-//    PointCloud<PointXYZRGBA> cloud;
-
-//    cloud.width = _lasFile->points().size();
-//    cloud.height = 1;
-//    cloud.is_dense = false;
-//    cloud.points.resize(cloud.width * cloud.width);
-
-//    int indexLasPoint = 0;
-
-//    for (PointXYZRGBA& p : cloud)
-//    {
-//        PointDataRecords* lasPoint = _lasFile->points()[indexLasPoint];
-//        p._PointXYZRGBA::x = lasPoint->x();
-//        p._PointXYZRGBA::y = lasPoint->y();
-//        p._PointXYZRGBA::z = lasPoint->z();
-//        p._PointXYZRGBA::r = lasPoint->red();
-//        p._PointXYZRGBA::g = lasPoint->green();
-//        p._PointXYZRGBA::b = lasPoint->blue();
-//        p._PointXYZRGBA::a = 255;
-
-//        indexLasPoint++;
-//    }
-
-//    io::savePCDFileASCII("test_pcd.pcd", cloud);
+    QList<PointDataRecords*> newPoint = TreatmentCGAL::removeOutliers(ui->openGLWidget->points());
+    _lasFile->setPoints(newPoint);
+    ui->openGLWidget->setPointsByOpenGL(_lasFile->points());
 }
 

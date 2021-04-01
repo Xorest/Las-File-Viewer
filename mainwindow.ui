@@ -47,6 +47,7 @@
      <string>Инструменты</string>
     </property>
     <addaction name="actionDletePoints"/>
+    <addaction name="actionRemoveOutliers"/>
    </widget>
    <widget class="QMenu" name="menu_2">
     <property name="title">
@@ -78,6 +79,14 @@
   <action name="actionOpen">
    <property name="text">
     <string>Открыть</string>
+   </property>
+  </action>
+  <action name="actionRemoveOutliers">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Удаление шумов</string>
    </property>
   </action>
  </widget>
