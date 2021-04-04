@@ -1,5 +1,7 @@
 #include "treatmentcgal.h"
 #include <CGAL/remove_outliers.h>
+#include <CGAL/compute_average_spacing.h>
+#include <CGAL/grid_simplify_point_set.h>
 #include <QDebug>
 
 QHash<long, PointCGAL> TreatmentCGAL::getQHash(const QList<PointDataRecords*> &points)
@@ -44,21 +46,51 @@ QHash<long, QHash<long, QHash<long, PointDataRecords*>>> TreatmentCGAL::getQHash
     return result;
 }
 
-QList<PointDataRecords*> TreatmentCGAL::removeOutliers(const QList<PointDataRecords*> &points)
+QList<PointDataRecords *> TreatmentCGAL::convertVectorToListPointsDataRecords(const QVector<PointCGAL> &PointsCGAL,  const QHash<long, QHash<long, QHash<long, PointDataRecords*>>> &pointsQHash)
 {
-    QVector<PointCGAL> vectorResultCGAL;
-    QHash<long, QHash<long, QHash<long, PointDataRecords*>>> pointsQHashXYZ = getQHashXYZ(points, vectorResultCGAL);
-    std::vector<PointCGAL> pointStdVector = std::vector<PointCGAL>(vectorResultCGAL.begin(), vectorResultCGAL.end());
-    std::vector<PointCGAL>::iterator outIter = CGAL::remove_outliers<CGAL::Sequential_tag>(pointStdVector, 200);
-    pointStdVector.erase(outIter, pointStdVector.end());
-    QVector<PointCGAL> outQVector(pointStdVector.begin(), pointStdVector.end());
-    QList<PointDataRecords*> outPoints;
+    QList<PointDataRecords*> result;
 
-    for (auto& p: outQVector)
+    for (auto& p: PointsCGAL)
     {
-        PointDataRecords* myPoint = pointsQHashXYZ[p.x()][p.y()][p.z()];
-        outPoints.append(myPoint);
+        PointDataRecords* myPoint = pointsQHash[p.x()][p.y()][p.z()];
+        result.append(myPoint);
     }
-    qDebug()<<outPoints.size();
-    return outPoints;
+
+    return result;
+}
+
+std::vector<PointCGAL> TreatmentCGAL::getStdVectorPointCGAL(const QList<PointDataRecords *> &points, QHash<long, QHash<long, QHash<long, PointDataRecords *> > > &pointsQHash)
+{
+    std::vector<PointCGAL> result;
+    QVector<PointCGAL> vectorResultCGAL;
+    pointsQHash = getQHashXYZ(points, vectorResultCGAL);
+
+    return std::vector<PointCGAL>(vectorResultCGAL.begin(), vectorResultCGAL.end());
+}
+
+QVector<PointCGAL> TreatmentCGAL::stdIterratorToQVector(std::vector<PointCGAL> &points, std::vector<PointCGAL>::iterator iterator)
+{
+    points.erase(iterator, points.end());
+
+    return QVector<PointCGAL>(points.begin(), points.end());
+}
+
+
+QList<PointDataRecords*> TreatmentCGAL::removeOutliers(const QList<PointDataRecords*> &points ,int k)
+{
+    QHash<long, QHash<long, QHash<long, PointDataRecords*>>> pointsQHashXYZ;
+    std::vector<PointCGAL> pointStdVector = getStdVectorPointCGAL(points, pointsQHashXYZ);
+    std::vector<PointCGAL>::iterator outIter = CGAL::remove_outliers<CGAL::Sequential_tag>(pointStdVector, k);
+
+    return convertVectorToListPointsDataRecords(stdIterratorToQVector(pointStdVector, outIter), pointsQHashXYZ);
+}
+
+QList<PointDataRecords *> TreatmentCGAL::simplifyPoint(const QList<PointDataRecords *> &points, int k)
+{
+  QHash<long, QHash<long, QHash<long, PointDataRecords*>>> pointsQHashXYZ;
+  std::vector<PointCGAL> pointStdVector = getStdVectorPointCGAL(points, pointsQHashXYZ);
+  double spacing = CGAL::compute_average_spacing<CGAL::Sequential_tag> (pointStdVector, k);
+  std::vector<PointCGAL>::iterator outIter = CGAL::grid_simplify_point_set (pointStdVector, 2.0 * spacing);
+
+  return convertVectorToListPointsDataRecords(stdIterratorToQVector(pointStdVector, outIter), pointsQHashXYZ);
 }

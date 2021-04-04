@@ -33,5 +33,8 @@ class MainWindow : public QMainWindow
             void deletePoints();
             void save();
             void removeOutliers();
+            void gridSimplify();
+            void bilateralSmooth();
+            void jetSmooth();
 };
 #endif // MAINWINDOW_H

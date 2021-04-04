@@ -42,6 +42,9 @@ void MainWindow::initMenu()
     connect(ui->actionSave, &QAction::triggered, this, &MainWindow::save);
     connect(ui->actionOpen, &QAction::triggered, this, &MainWindow::open);
     connect(ui->actionRemoveOutliers, &QAction::triggered, this, &MainWindow::removeOutliers);
+    connect(ui->actionGridSimplifyPoint, &QAction::triggered, this, &MainWindow::gridSimplify);
+    connect(ui->actionBilateralSmooth, &QAction::triggered, this, &MainWindow::bilateralSmooth);
+    connect(ui->actionJetSmooth, &QAction::triggered, this, &MainWindow::jetSmooth);
 }
 void MainWindow::trigger()
 {
@@ -61,6 +64,7 @@ void MainWindow::open()
     ui->actionSave->setEnabled(true);
     ui->actionDletePoints->setEnabled(true);
     ui->actionRemoveOutliers->setEnabled(true);
+    ui->actionGridSimplifyPoint->setEnabled(true);
 }
 
 void MainWindow::pushButtonBreakClic()
@@ -83,8 +87,25 @@ void MainWindow::save()
 
 void MainWindow::removeOutliers()
 {
-    QList<PointDataRecords*> newPoint = TreatmentCGAL::removeOutliers(ui->openGLWidget->points());
-    _lasFile->setPoints(newPoint);
+    _lasFile->setPoints(TreatmentCGAL::removeOutliers(ui->openGLWidget->points(), 100));
     ui->openGLWidget->setPointsByOpenGL(_lasFile->points());
+    qDebug()<<_lasFile->points().size();
+}
+
+void MainWindow::gridSimplify()
+{
+    _lasFile->setPoints(TreatmentCGAL::removeOutliers(ui->openGLWidget->points(), 6));
+    ui->openGLWidget->setPointsByOpenGL(_lasFile->points());
+    qDebug()<<_lasFile->points().size();
+}
+
+void MainWindow::bilateralSmooth()
+{
+    //todo доделать
+}
+
+void MainWindow::jetSmooth()
+{
+    //todo доделать
 }
 
