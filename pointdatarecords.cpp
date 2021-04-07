@@ -36,6 +36,21 @@ long PointDataRecords::z()
     return _z;
 }
 
+void PointDataRecords::setX(long x)
+{
+    _x = x;
+}
+
+void PointDataRecords::setY(long y)
+{
+    _y = y;
+}
+
+void PointDataRecords::setZ(long z)
+{
+    _z = z;
+}
+
 ushort PointDataRecords::intensity()
 {
     return  _intensity;

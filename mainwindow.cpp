@@ -3,6 +3,7 @@
 #include <QFileDialog>
 #include <QAction>
 #include <QList>
+#include <QtConcurrent>
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "treatmentcgal.h"
@@ -43,9 +44,16 @@ void MainWindow::initMenu()
     connect(ui->actionOpen, &QAction::triggered, this, &MainWindow::open);
     connect(ui->actionRemoveOutliers, &QAction::triggered, this, &MainWindow::removeOutliers);
     connect(ui->actionGridSimplifyPoint, &QAction::triggered, this, &MainWindow::gridSimplify);
-    connect(ui->actionBilateralSmooth, &QAction::triggered, this, &MainWindow::bilateralSmooth);
     connect(ui->actionJetSmooth, &QAction::triggered, this, &MainWindow::jetSmooth);
 }
+
+void MainWindow::treatmentText()
+{
+    ui->menubar->setEnabled(false);
+    _menu->setEnabled(false);
+    ui->statusbar->showMessage("Обработка...");
+}
+
 void MainWindow::trigger()
 {
     _lasFile->cutPoints(ui->openGLWidget->cutPosBegin(),ui->openGLWidget->cutPosEnd());
@@ -65,6 +73,7 @@ void MainWindow::open()
     ui->actionDletePoints->setEnabled(true);
     ui->actionRemoveOutliers->setEnabled(true);
     ui->actionGridSimplifyPoint->setEnabled(true);
+    ui->actionJetSmooth->setEnabled(true);
 }
 
 void MainWindow::pushButtonBreakClic()
@@ -87,25 +96,32 @@ void MainWindow::save()
 
 void MainWindow::removeOutliers()
 {
-    _lasFile->setPoints(TreatmentCGAL::removeOutliers(ui->openGLWidget->points(), 100));
-    ui->openGLWidget->setPointsByOpenGL(_lasFile->points());
-    qDebug()<<_lasFile->points().size();
+    connect(&_watcher, &QFutureWatcher<QList<PointDataRecords*>>::finished, this, &MainWindow::watcherFinshed);
+    _watcher.setFuture(QtConcurrent::run(TreatmentCGAL::removeOutliers, ui->openGLWidget->points(), 100));
+    treatmentText();
 }
 
 void MainWindow::gridSimplify()
 {
-    _lasFile->setPoints(TreatmentCGAL::removeOutliers(ui->openGLWidget->points(), 6));
-    ui->openGLWidget->setPointsByOpenGL(_lasFile->points());
-    qDebug()<<_lasFile->points().size();
-}
-
-void MainWindow::bilateralSmooth()
-{
-    //todo доделать
+    connect(&_watcher, &QFutureWatcher<QList<PointDataRecords*>>::finished, this, &MainWindow::watcherFinshed);
+    _watcher.setFuture(QtConcurrent::run(TreatmentCGAL::simplifyPoint, ui->openGLWidget->points(), 20));
+    treatmentText();
 }
 
 void MainWindow::jetSmooth()
 {
-    //todo доделать
+    connect(&_watcher, &QFutureWatcher<QList<PointDataRecords*>>::finished, this, &MainWindow::watcherFinshed);
+    _watcher.setFuture(QtConcurrent::run(TreatmentCGAL::jetSmooth, ui->openGLWidget->points(), 8));
+    treatmentText();
+}
+
+void MainWindow::watcherFinshed()
+{
+    _lasFile->setPoints(_watcher.result());
+    ui->openGLWidget->setPointsByOpenGL(_lasFile->points());
+    ui->menubar->setEnabled(true);
+    _menu->setEnabled(true);
+    ui->statusbar->showMessage("OK", 300);
+    qDebug()<<_lasFile->points().size();
 }
 

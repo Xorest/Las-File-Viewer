@@ -12,6 +12,9 @@ class PointDataRecords
         long x();
         long y();
         long z();
+        void setX(long x);
+        void setY(long y);
+        void setZ(long z);
         ushort intensity();
         uchar neponyatno();
         uchar classification();

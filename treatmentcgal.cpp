@@ -2,7 +2,10 @@
 #include <CGAL/remove_outliers.h>
 #include <CGAL/compute_average_spacing.h>
 #include <CGAL/grid_simplify_point_set.h>
+#include <CGAL/jet_smooth_point_set.h>
 #include <QDebug>
+
+typedef CGAL::Parallel_if_available_tag Concurrency_tag;
 
 QHash<long, PointCGAL> TreatmentCGAL::getQHash(const QList<PointDataRecords*> &points)
 {
@@ -93,4 +96,23 @@ QList<PointDataRecords *> TreatmentCGAL::simplifyPoint(const QList<PointDataReco
   std::vector<PointCGAL>::iterator outIter = CGAL::grid_simplify_point_set (pointStdVector, 2.0 * spacing);
 
   return convertVectorToListPointsDataRecords(stdIterratorToQVector(pointStdVector, outIter), pointsQHashXYZ);
+}
+
+QList<PointDataRecords *> TreatmentCGAL::jetSmooth(const QList<PointDataRecords *> &points, int k)
+{
+    QList<PointDataRecords*> result = points;
+
+    QHash<long, QHash<long, QHash<long, PointDataRecords*>>> pointsQHashXYZ;
+    std::vector<PointCGAL> pointStdVector = getStdVectorPointCGAL(points, pointsQHashXYZ);
+    CGAL::jet_smooth_point_set<Concurrency_tag>(pointStdVector, k);
+    QVector<PointCGAL> vector(pointStdVector.begin(), pointStdVector.end());
+
+    for (int i = 0; i < vector.size(); i++)
+    {
+        result[i]->setX((long)vector[i].x());
+        result[i]->setY((long)vector[i].y());
+        result[i]->setZ((long)vector[i].z());
+    }
+
+    return result;
 }

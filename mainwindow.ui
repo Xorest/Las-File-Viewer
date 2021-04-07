@@ -46,22 +46,10 @@
     <property name="title">
      <string>Инструменты</string>
     </property>
-    <widget class="QMenu" name="menu_3">
-     <property name="enabled">
-      <bool>false</bool>
-     </property>
-     <property name="title">
-      <string>Сглаживание </string>
-     </property>
-     <addaction name="separator"/>
-     <addaction name="separator"/>
-     <addaction name="actionBilateralSmooth"/>
-     <addaction name="actionJetSmooth"/>
-    </widget>
     <addaction name="actionDletePoints"/>
     <addaction name="actionRemoveOutliers"/>
     <addaction name="actionGridSimplifyPoint"/>
-    <addaction name="menu_3"/>
+    <addaction name="actionJetSmooth"/>
    </widget>
    <widget class="QMenu" name="menu_2">
     <property name="title">
@@ -111,17 +99,12 @@
     <string>Удаление лишних точек</string>
    </property>
   </action>
-  <action name="actionBilateralSmooth">
+  <action name="actionJetSmooth">
    <property name="enabled">
     <bool>false</bool>
    </property>
    <property name="text">
-    <string>Двухстороннее</string>
-   </property>
-  </action>
-  <action name="actionJetSmooth">
-   <property name="text">
-    <string>Струйное</string>
+    <string>Сглаживание</string>
    </property>
   </action>
  </widget>

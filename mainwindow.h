@@ -5,6 +5,7 @@
 #include <QAction>
 #include <QMenu>
 #include <QContextMenuEvent>
+#include <QFutureWatcher>
 #include "file.h"
 
 QT_BEGIN_NAMESPACE
@@ -25,7 +26,9 @@ class MainWindow : public QMainWindow
         File* _lasFile;
         QAction* _actionCut;
         QMenu* _menu;
+        QFutureWatcher<QList<PointDataRecords*>> _watcher;
         void initMenu();
+        void treatmentText();
     private slots:
             void trigger();
             void open();
@@ -34,7 +37,7 @@ class MainWindow : public QMainWindow
             void save();
             void removeOutliers();
             void gridSimplify();
-            void bilateralSmooth();
             void jetSmooth();
+            void watcherFinshed();
 };
 #endif // MAINWINDOW_H

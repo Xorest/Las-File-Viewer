@@ -1,6 +1,4 @@
-QT       += core gui opengl openglwidgets
-
-greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
+QT += core gui opengl openglwidgets widgets concurrent
 
 CONFIG += c++14
 CONFIG -= debug_and_relase
@@ -10,6 +8,7 @@ MOC_DIR = build
 RCC_DIR = build
 UI_DIR = build
 
+QMAKE_CXXFLAGS += -Wno-attributes -Wno-cpp
 # You can make your code fail to compile if it uses deprecated APIs.
 # In order to do so, uncomment the following line.
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
@@ -50,7 +49,7 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 RESOURCES += \
     resourse.qrc
 
-INCLUDEPATH += "D:\boost"
+INCLUDEPATH += "D:\boost" "C:/Program Files (x86)/Eigen3/include/eigen3"
 
 INCLUDEPATH += 'C:/Program Files (x86)/CGAL/include'
 DEPENDPATH += 'C:/Program Files (x86)/CGAL/include'

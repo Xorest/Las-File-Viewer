@@ -32,12 +32,12 @@ public:
     QAction *actionGridSimplifyPoint;
     QAction *actionBilateralSmooth;
     QAction *actionJetSmooth;
+    QAction *actionJetSmooth_2;
     QWidget *centralwidget;
     QVBoxLayout *verticalLayout;
     OpenGLWidget *openGLWidget;
     QMenuBar *menubar;
     QMenu *menu;
-    QMenu *menu_3;
     QMenu *menu_2;
     QStatusBar *statusbar;
 
@@ -66,6 +66,9 @@ public:
         actionBilateralSmooth->setEnabled(false);
         actionJetSmooth = new QAction(MainWindow);
         actionJetSmooth->setObjectName(QString::fromUtf8("actionJetSmooth"));
+        actionJetSmooth_2 = new QAction(MainWindow);
+        actionJetSmooth_2->setObjectName(QString::fromUtf8("actionJetSmooth_2"));
+        actionJetSmooth_2->setEnabled(false);
         centralwidget = new QWidget(MainWindow);
         centralwidget->setObjectName(QString::fromUtf8("centralwidget"));
         verticalLayout = new QVBoxLayout(centralwidget);
@@ -87,9 +90,6 @@ public:
         menubar->setGeometry(QRect(0, 0, 1285, 20));
         menu = new QMenu(menubar);
         menu->setObjectName(QString::fromUtf8("menu"));
-        menu_3 = new QMenu(menu);
-        menu_3->setObjectName(QString::fromUtf8("menu_3"));
-        menu_3->setEnabled(false);
         menu_2 = new QMenu(menubar);
         menu_2->setObjectName(QString::fromUtf8("menu_2"));
         MainWindow->setMenuBar(menubar);
@@ -102,11 +102,7 @@ public:
         menu->addAction(actionDletePoints);
         menu->addAction(actionRemoveOutliers);
         menu->addAction(actionGridSimplifyPoint);
-        menu->addAction(menu_3->menuAction());
-        menu_3->addSeparator();
-        menu_3->addSeparator();
-        menu_3->addAction(actionBilateralSmooth);
-        menu_3->addAction(actionJetSmooth);
+        menu->addAction(actionJetSmooth_2);
         menu_2->addAction(actionSave);
         menu_2->addAction(actionOpen);
 
@@ -125,8 +121,8 @@ public:
         actionGridSimplifyPoint->setText(QCoreApplication::translate("MainWindow", "\320\243\320\264\320\260\320\273\320\265\320\275\320\270\320\265 \320\273\320\270\321\210\320\275\320\270\321\205 \321\202\320\276\321\207\320\265\320\272", nullptr));
         actionBilateralSmooth->setText(QCoreApplication::translate("MainWindow", "\320\224\320\262\321\203\321\205\321\201\321\202\320\276\321\200\320\276\320\275\320\275\320\265\320\265", nullptr));
         actionJetSmooth->setText(QCoreApplication::translate("MainWindow", "\320\241\321\202\321\200\321\203\320\271\320\275\320\276\320\265", nullptr));
+        actionJetSmooth_2->setText(QCoreApplication::translate("MainWindow", "\320\241\320\263\320\273\320\260\320\266\320\270\320\262\320\260\320\275\320\270\320\265", nullptr));
         menu->setTitle(QCoreApplication::translate("MainWindow", "\320\230\320\275\321\201\321\202\321\200\321\203\320\274\320\265\320\275\321\202\321\213", nullptr));
-        menu_3->setTitle(QCoreApplication::translate("MainWindow", "\320\241\320\263\320\273\320\260\320\266\320\270\320\262\320\260\320\275\320\270\320\265 ", nullptr));
         menu_2->setTitle(QCoreApplication::translate("MainWindow", "\320\244\320\260\320\271\320\273", nullptr));
     } // retranslateUi
 
