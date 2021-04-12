@@ -43,7 +43,9 @@ void MainWindow::initMenu()
     connect(ui->actionSave, &QAction::triggered, this, &MainWindow::save);
     connect(ui->actionOpen, &QAction::triggered, this, &MainWindow::open);
     connect(ui->actionRemoveOutliers, &QAction::triggered, this, &MainWindow::removeOutliers);
-    connect(ui->actionGridSimplifyPoint, &QAction::triggered, this, &MainWindow::gridSimplify);
+    connect(ui->actionGridSimplify, &QAction::triggered, this, &MainWindow::gridSimplify);
+    connect(ui->actionHierarchySmiplfy, &QAction::triggered, this, &MainWindow::hierarchySimplify);
+    connect(ui->actionRandomSimplify, &QAction::triggered, this, &MainWindow::randomSimplify);
     connect(ui->actionJetSmooth, &QAction::triggered, this, &MainWindow::jetSmooth);
 }
 
@@ -72,8 +74,11 @@ void MainWindow::open()
     ui->actionSave->setEnabled(true);
     ui->actionDletePoints->setEnabled(true);
     ui->actionRemoveOutliers->setEnabled(true);
-    ui->actionGridSimplifyPoint->setEnabled(true);
+    ui->actionGridSimplify->setEnabled(true);
+    ui->actionHierarchySmiplfy->setEnabled(true);
+    ui->actionRandomSimplify->setEnabled(true);
     ui->actionJetSmooth->setEnabled(true);
+    ui->menuSimplify->setEnabled(true);
 }
 
 void MainWindow::pushButtonBreakClic()
@@ -104,7 +109,21 @@ void MainWindow::removeOutliers()
 void MainWindow::gridSimplify()
 {
     connect(&_watcher, &QFutureWatcher<QList<PointDataRecords*>>::finished, this, &MainWindow::watcherFinshed);
-    _watcher.setFuture(QtConcurrent::run(TreatmentCGAL::simplifyPoint, ui->openGLWidget->points(), 20));
+    _watcher.setFuture(QtConcurrent::run(TreatmentCGAL::gridSimplify, ui->openGLWidget->points(), 20));
+    treatmentText();
+}
+
+void MainWindow::hierarchySimplify()
+{
+    connect(&_watcher, &QFutureWatcher<QList<PointDataRecords*>>::finished, this, &MainWindow::watcherFinshed);
+    _watcher.setFuture(QtConcurrent::run(TreatmentCGAL::hierarchySimplify, ui->openGLWidget->points(), 20));
+    treatmentText();
+}
+
+void MainWindow::randomSimplify()
+{
+    connect(&_watcher, &QFutureWatcher<QList<PointDataRecords*>>::finished, this, &MainWindow::watcherFinshed);
+    _watcher.setFuture(QtConcurrent::run(TreatmentCGAL::randomSimplify, ui->openGLWidget->points(), 100));
     treatmentText();
 }
 

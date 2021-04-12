@@ -37,6 +37,8 @@ class MainWindow : public QMainWindow
             void save();
             void removeOutliers();
             void gridSimplify();
+            void hierarchySimplify();
+            void randomSimplify();
             void jetSmooth();
             void watcherFinshed();
 };

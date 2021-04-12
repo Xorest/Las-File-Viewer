@@ -15,8 +15,11 @@ class TreatmentCGAL
 {
     public:
         static QList<PointDataRecords*> removeOutliers(const QList<PointDataRecords*> &points, int k);
-        static QList<PointDataRecords*> simplifyPoint(const QList<PointDataRecords*> &points, int k);
+        static QList<PointDataRecords*> gridSimplify(const QList<PointDataRecords*> &points, int k);
+        static QList<PointDataRecords*> randomSimplify(const QList<PointDataRecords*> &points, int k);
+        static QList<PointDataRecords*> hierarchySimplify(const QList<PointDataRecords*> &points, int k);
         static QList<PointDataRecords*> jetSmooth(const QList<PointDataRecords*> &points, int k);
+
     private:
         static QHash<long, PointCGAL> getQHash(const QList<PointDataRecords*> &points);
         static QVector<PointCGAL> getQVector(const QList<PointDataRecords*> &points);

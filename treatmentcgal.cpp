@@ -3,6 +3,8 @@
 #include <CGAL/compute_average_spacing.h>
 #include <CGAL/grid_simplify_point_set.h>
 #include <CGAL/jet_smooth_point_set.h>
+#include <CGAL/random_simplify_point_set.h>
+#include <CGAL/hierarchy_simplify_point_set.h>
 #include <QDebug>
 
 typedef CGAL::Parallel_if_available_tag Concurrency_tag;
@@ -81,38 +83,92 @@ QVector<PointCGAL> TreatmentCGAL::stdIterratorToQVector(std::vector<PointCGAL> &
 
 QList<PointDataRecords*> TreatmentCGAL::removeOutliers(const QList<PointDataRecords*> &points ,int k)
 {
-    QHash<long, QHash<long, QHash<long, PointDataRecords*>>> pointsQHashXYZ;
-    std::vector<PointCGAL> pointStdVector = getStdVectorPointCGAL(points, pointsQHashXYZ);
-    std::vector<PointCGAL>::iterator outIter = CGAL::remove_outliers<CGAL::Sequential_tag>(pointStdVector, k);
+    try
+    {
+        QHash<long, QHash<long, QHash<long, PointDataRecords*>>> pointsQHashXYZ;
+        std::vector<PointCGAL> pointStdVector = getStdVectorPointCGAL(points, pointsQHashXYZ);
+        std::vector<PointCGAL>::iterator outIter = CGAL::remove_outliers<CGAL::Sequential_tag>(pointStdVector, k);
 
-    return convertVectorToListPointsDataRecords(stdIterratorToQVector(pointStdVector, outIter), pointsQHashXYZ);
+        return convertVectorToListPointsDataRecords(stdIterratorToQVector(pointStdVector, outIter), pointsQHashXYZ);
+    }
+    catch(...)
+    {
+        return points;
+    }
 }
 
-QList<PointDataRecords *> TreatmentCGAL::simplifyPoint(const QList<PointDataRecords *> &points, int k)
+QList<PointDataRecords *> TreatmentCGAL::gridSimplify(const QList<PointDataRecords *> &points, int k)
 {
-  QHash<long, QHash<long, QHash<long, PointDataRecords*>>> pointsQHashXYZ;
-  std::vector<PointCGAL> pointStdVector = getStdVectorPointCGAL(points, pointsQHashXYZ);
-  double spacing = CGAL::compute_average_spacing<CGAL::Sequential_tag> (pointStdVector, k);
-  std::vector<PointCGAL>::iterator outIter = CGAL::grid_simplify_point_set (pointStdVector, 2.0 * spacing);
+    try
+    {
+        QHash<long, QHash<long, QHash<long, PointDataRecords*>>> pointsQHashXYZ;
+        std::vector<PointCGAL> pointStdVector = getStdVectorPointCGAL(points, pointsQHashXYZ);
+        double spacing = CGAL::compute_average_spacing<CGAL::Sequential_tag> (pointStdVector, k);
+        std::vector<PointCGAL>::iterator outIter = CGAL::grid_simplify_point_set (pointStdVector, 2.0 * spacing);
 
-  return convertVectorToListPointsDataRecords(stdIterratorToQVector(pointStdVector, outIter), pointsQHashXYZ);
+        return convertVectorToListPointsDataRecords(stdIterratorToQVector(pointStdVector, outIter), pointsQHashXYZ);
+    }
+    catch(...)
+    {
+        return points;
+    }
+}
+
+QList<PointDataRecords *> TreatmentCGAL::randomSimplify(const QList<PointDataRecords *> &points, int k)
+{
+    try
+    {
+        QHash<long, QHash<long, QHash<long, PointDataRecords*>>> pointsQHashXYZ;
+        std::vector<PointCGAL> pointStdVector = getStdVectorPointCGAL(points, pointsQHashXYZ);
+        double spacing = CGAL::compute_average_spacing<CGAL::Sequential_tag> (pointStdVector, k);
+        std::vector<PointCGAL>::iterator outIter = CGAL::random_simplify_point_set (pointStdVector, 2.0 * spacing);
+
+        return convertVectorToListPointsDataRecords(stdIterratorToQVector(pointStdVector, outIter), pointsQHashXYZ);
+    }
+    catch(...)
+    {
+        return points;
+    }
+}
+
+QList<PointDataRecords *> TreatmentCGAL::hierarchySimplify(const QList<PointDataRecords *> &points, int k)
+{
+    try
+    {
+        QHash<long, QHash<long, QHash<long, PointDataRecords*>>> pointsQHashXYZ;
+        std::vector<PointCGAL> pointStdVector = getStdVectorPointCGAL(points, pointsQHashXYZ);
+        std::vector<PointCGAL>::iterator outIter = CGAL::hierarchy_simplify_point_set(pointStdVector, CGAL::parameters::size(k).maximum_variation(0.01));
+
+        return convertVectorToListPointsDataRecords(stdIterratorToQVector(pointStdVector, outIter), pointsQHashXYZ);
+    }
+    catch(...)
+    {
+        return points;
+    }
 }
 
 QList<PointDataRecords *> TreatmentCGAL::jetSmooth(const QList<PointDataRecords *> &points, int k)
 {
-    QList<PointDataRecords*> result = points;
-
-    QHash<long, QHash<long, QHash<long, PointDataRecords*>>> pointsQHashXYZ;
-    std::vector<PointCGAL> pointStdVector = getStdVectorPointCGAL(points, pointsQHashXYZ);
-    CGAL::jet_smooth_point_set<Concurrency_tag>(pointStdVector, k);
-    QVector<PointCGAL> vector(pointStdVector.begin(), pointStdVector.end());
-
-    for (int i = 0; i < vector.size(); i++)
+    try
     {
-        result[i]->setX((long)vector[i].x());
-        result[i]->setY((long)vector[i].y());
-        result[i]->setZ((long)vector[i].z());
-    }
+        QList<PointDataRecords*> result = points;
 
-    return result;
+        QHash<long, QHash<long, QHash<long, PointDataRecords*>>> pointsQHashXYZ;
+        std::vector<PointCGAL> pointStdVector = getStdVectorPointCGAL(points, pointsQHashXYZ);
+        CGAL::jet_smooth_point_set<Concurrency_tag>(pointStdVector, k);
+        QVector<PointCGAL> vector(pointStdVector.begin(), pointStdVector.end());
+
+        for (int i = 0; i < vector.size(); i++)
+        {
+            result[i]->setX((long)vector[i].x());
+            result[i]->setY((long)vector[i].y());
+            result[i]->setZ((long)vector[i].z());
+        }
+
+        return result;
+    }
+    catch(...)
+    {
+        return points;
+    }
 }

@@ -46,9 +46,20 @@
     <property name="title">
      <string>Инструменты</string>
     </property>
+    <widget class="QMenu" name="menuSimplify">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+     <property name="title">
+      <string>Удаление лишних точек</string>
+     </property>
+     <addaction name="actionRandomSimplify"/>
+     <addaction name="actionGridSimplify"/>
+     <addaction name="actionHierarchySmiplfy"/>
+    </widget>
     <addaction name="actionDletePoints"/>
     <addaction name="actionRemoveOutliers"/>
-    <addaction name="actionGridSimplifyPoint"/>
+    <addaction name="menuSimplify"/>
     <addaction name="actionJetSmooth"/>
    </widget>
    <widget class="QMenu" name="menu_2">
@@ -91,20 +102,36 @@
     <string>Удаление шумов</string>
    </property>
   </action>
-  <action name="actionGridSimplifyPoint">
-   <property name="enabled">
-    <bool>false</bool>
-   </property>
-   <property name="text">
-    <string>Удаление лишних точек</string>
-   </property>
-  </action>
   <action name="actionJetSmooth">
    <property name="enabled">
     <bool>false</bool>
    </property>
    <property name="text">
     <string>Сглаживание</string>
+   </property>
+  </action>
+  <action name="actionRandomSimplify">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Рандомное</string>
+   </property>
+  </action>
+  <action name="actionGridSimplify">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Сетка</string>
+   </property>
+  </action>
+  <action name="actionHierarchySmiplfy">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Иерархическая</string>
    </property>
   </action>
  </widget>
