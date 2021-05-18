@@ -131,7 +131,10 @@
     <bool>false</bool>
    </property>
    <property name="text">
-    <string>Иерархическая</string>
+    <string>Иерархическое</string>
+   </property>
+   <property name="toolTip">
+    <string>Иерархическое</string>
    </property>
   </action>
  </widget>

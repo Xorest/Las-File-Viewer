@@ -8,12 +8,6 @@
 #include "ui_mainwindow.h"
 #include "treatmentcgal.h"
 #include <QDebug>
-//#include <pcl/pcl_base.h>
-//#include <pcl/impl/point_types.hpp>
-//#include <pcl/io/io.h>
-//#include <pcl/io/pcd_io.h>
-
-//using namespace pcl;
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent),
@@ -79,6 +73,8 @@ void MainWindow::open()
     ui->actionRandomSimplify->setEnabled(true);
     ui->actionJetSmooth->setEnabled(true);
     ui->menuSimplify->setEnabled(true);
+
+    qDebug()<<_lasFile->headerFile()->offsetX()<< _lasFile->headerFile()->offsetY()<< _lasFile->headerFile()->offsetZ();
 }
 
 void MainWindow::pushButtonBreakClic()
@@ -123,7 +119,7 @@ void MainWindow::hierarchySimplify()
 void MainWindow::randomSimplify()
 {
     connect(&_watcher, &QFutureWatcher<QList<PointDataRecords*>>::finished, this, &MainWindow::watcherFinshed);
-    _watcher.setFuture(QtConcurrent::run(TreatmentCGAL::randomSimplify, ui->openGLWidget->points(), 100));
+    _watcher.setFuture(QtConcurrent::run(TreatmentCGAL::randomSimplify, ui->openGLWidget->points(), 20));
     treatmentText();
 }
 

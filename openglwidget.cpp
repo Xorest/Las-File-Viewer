@@ -12,7 +12,7 @@
 
 OpenGLWidget::OpenGLWidget(QWidget* parent)
     : QOpenGLWidget(parent),
-      _zoom(-2000),
+      _zoom(-3000),
       _isContrePress(false),
       _kMoveX(0),
       _kMoveY(0),
@@ -117,10 +117,8 @@ void OpenGLWidget::paintGL()
     {
         QMatrix4x4 m = _camera->viewMatrix();
         m.frustum(-_zoom,_zoom, -_zoom, _zoom, 25, 10000000);
-        m.translate(-(_minPoint[0] + ((_maxPoint[0] - _minPoint[0])/2)),-(_minPoint[1] + ((_maxPoint[1] - _minPoint[1])/2)),-50);
+        m.translate(-(_minPoint[0] + ((_maxPoint[0] - _minPoint[0])/2)),- (_minPoint[1] + ((_maxPoint[1] - _minPoint[1])/2)),-50);
 //        m.rotate(5, 1,0,0);
-
-
         _shaderProgramm->bind();
         _shaderProgramm->setUniformValue("matrix", m);
 
@@ -184,8 +182,7 @@ void OpenGLWidget::mouseMoveEvent(QMouseEvent *event)
         {
 
             int radius = -_zoom / 25;
-            bool condition = !((qPow(((p->x()) - point.x()), 2) + qPow(((p->y()) - point.y()), 2) >qPow(radius ,2)));
-            //bool condition1 = (point.x() - radius < p->x() && point.x() + radius > p->x() && point.y() - radius < p->y() && point.y() + radius > p->y());
+            bool condition = !((qPow(((p->x()) - point.x()), 2) + qPow(((p->y()) - point.y()), 2) > qPow(radius ,2)));
 
             if (condition)
             {
@@ -294,15 +291,11 @@ void OpenGLWidget::initVBO()
     {
         vertData.append(p->x());
         vertData.append(p->y());
-
-        //float z = (p->z() - _minPoint[2])/700; //3D визуализация
         vertData.append(0);
-//        vertData.append(p->z()/10000);
         vertData.append((p->red() / 655.35) * 0.01);
         vertData.append((p->green()/ 655.35) * 0.01);
         vertData.append((p->blue()/ 655.35) * 0.01);
     }
-//    _points.size() > 30 ? qDebug()<< _points.size():qDebug()<<vertData;
 
     _vbo.create();
     _vbo.bind();
@@ -392,8 +385,14 @@ void OpenGLWidget::drawVbo()
 QPointF OpenGLWidget::currentOpenGLPosition(QPoint mousePosition)
 {
     QPointF point;
-    point.setX(((4.0 * _zoom) * mousePosition.x() / width() - (2.0 * _zoom)) + (_minPoint[0] + ((_maxPoint[0] - _minPoint[0])/2)) + (_kMoveX * -_zoom * 2));
-    point.setY(((2.0 * _zoom) - (4.0 * _zoom) * mousePosition.y() / height()) + (_minPoint[1] + ((_maxPoint[1] - _minPoint[1])/2)) + (_kMoveY * -_zoom * 2));
+    point.setX(((4.0 * _zoom) * mousePosition.x() / width() -
+                (2.0 * _zoom)) + (_minPoint[0] +
+               ((_maxPoint[0] - _minPoint[0])/2)) +
+                (_kMoveX * -_zoom * 2));
+    point.setY(((2.0 * _zoom) - (4.0 * _zoom) *
+                mousePosition.y() / height()) +
+               (_minPoint[1] + ((_maxPoint[1] - _minPoint[1])/2)) +
+            (_kMoveY * -_zoom * 2));
 
     return point;
 }

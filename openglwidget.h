@@ -66,8 +66,6 @@ class OpenGLWidget : public QOpenGLWidget, protected QOpenGLFunctions
         void drawLineLoop(QOpenGLBuffer* buffer, QOpenGLShaderProgram* programm);
         void drawVbo();
         QPointF currentOpenGLPosition(QPoint mousePosition);
-
-
 };
 
 #endif // OPENGLWIDGET_H

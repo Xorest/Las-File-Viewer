@@ -18,7 +18,9 @@ class File
         void cutPoints(QPoint beginPoint, QPoint endPoint);
         void cutPoints();
         void save(QList<PointDataRecords*> points);
-        void savingLasFile(HeaderFile* newHeaderFile, VariableLengthRecordsFile* newVariableLengthRecordsFile, QByteArray pointsData);
+        void savingLasFile(HeaderFile* newHeaderFile,
+                           VariableLengthRecordsFile* newVariableLengthRecordsFile,
+                           QByteArray pointsData);
         void setPoints(QList<PointDataRecords*> points);
     private:
         QString _pathFile;

@@ -39,10 +39,22 @@ void File::cutPoints(QPoint beginPoint, QPoint endPoint)
 
     for (PointDataRecords* p : qAsConst(_points))
     {
-        bool condition1 = (p->x() > beginPoint.x()  && p->x() < endPoint.x() && p->y() > beginPoint.y() && p->y() < endPoint.y());
-        bool condition2 = (p->x() < beginPoint.x()  && p->x() > endPoint.x() && p->y() > beginPoint.y() && p->y() < endPoint.y());
-        bool condition3 = (p->x() < beginPoint.x()  && p->x() > endPoint.x() && p->y() < beginPoint.y() && p->y() > endPoint.y());
-        bool condition4 = (p->x() > beginPoint.x()  && p->x() < endPoint.x() && p->y() < beginPoint.y() && p->y() > endPoint.y());
+        bool condition1 = (p->x() > beginPoint.x()  &&
+                           p->x() < endPoint.x() &&
+                           p->y() > beginPoint.y() &&
+                           p->y() < endPoint.y());
+        bool condition2 = (p->x() < beginPoint.x()  &&
+                           p->x() > endPoint.x() &&
+                           p->y() > beginPoint.y() &&
+                           p->y() < endPoint.y());
+        bool condition3 = (p->x() < beginPoint.x()  &&
+                           p->x() > endPoint.x() &&
+                           p->y() < beginPoint.y() &&
+                           p->y() > endPoint.y());
+        bool condition4 = (p->x() > beginPoint.x()  &&
+                           p->x() < endPoint.x() &&
+                           p->y() < beginPoint.y() &&
+                           p->y() > endPoint.y());
 
         if (condition1 || condition2 || condition3 || condition4)
         {

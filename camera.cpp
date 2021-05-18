@@ -1,5 +1,4 @@
 #include "camera.h"
-#include "camera.h"
 
 Camera::Camera(const QVector3D &pos)
     : m_forward(0.0f, -1.0f, 0.0f),
