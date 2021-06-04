@@ -12,7 +12,7 @@
 
 OpenGLWidget::OpenGLWidget(QWidget* parent)
     : QOpenGLWidget(parent),
-      _zoom(-3000),
+      _zoom(-5000),
       _isContrePress(false),
       _kMoveX(0),
       _kMoveY(0),

@@ -239,7 +239,8 @@ void File::readFile()
     {
         QByteArray localByteArray = file.readAll();
         _headerFile = new HeaderFile(localByteArray.mid(0, 227));
-        _variableLengthRecordsFile = new VariableLengthRecordsFile(localByteArray.mid(_headerFile->headerSize(), 54));
+        _variableLengthRecordsFile = new VariableLengthRecordsFile(
+                    localByteArray.mid(_headerFile->headerSize(), 54));
         _points = getPoints(localByteArray.mid(_headerFile->offsetToPointData()));
         file.close();
     }
